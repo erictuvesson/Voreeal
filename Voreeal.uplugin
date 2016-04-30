@@ -1,0 +1,34 @@
+{
+	"FileVersion": 3,
+	
+	"FriendlyName": "Voreeal",
+	"IsBetaVersion": true,
+	"Version": 1,
+	"VersionName": "1.0",
+	"Description": "Voreeal is a voxel library for Unreal Engine 4 powered by PolyVox.",
+	"Category": "Other",
+
+	"CreatedBy": "Eric Tuvesson",
+	"CreatedByURL": "https://github.com/ChillyFlashER/Voreeal",
+	"MarketplaceURL": "",
+	"EnabledByDefault": true,
+
+	"CanContainContent": true,
+
+	"Modules": [
+	  {
+	    "Name": "Voreeal",
+	    "Type": "Runtime",
+	    "LoadingPhase": "PreDefault"
+	  },
+	  {
+	    "Name": "VoreealEditor",
+	    "Type": "Editor",
+	    "LoadingPhase": "PreDefault"
+	  },
+	  {
+	    "Name": "VoreealVolumeImporter",
+	    "Type": "Editor"
+	  }
+	]
+}
