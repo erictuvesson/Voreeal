@@ -50,8 +50,8 @@ void UBasicVolume::PostLoad()
 	}
 	else
 	{
-		// TODO: Move?
-		Resize(FRegion(0, 0, 0, 64, 64, 64));
+		// TODO: set default size from settings
+		Resize(FIntVector(64, 64, 64));
 	}
 }
 
@@ -62,26 +62,20 @@ void UBasicVolume::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) cons
 	{
 		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
 	}
-
 	Super::GetAssetRegistryTags(OutTags);
 }
 #endif
 
-void UBasicVolume::ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh)
-{
-	Internal_ExtractMesh(Volume.get(), ExtractorType, Region, LOD, Mesh);
-}
-
 bool UBasicVolume::IsValid() const
 {
-    return Volume != nullptr;
+	return Volume != nullptr;
 }
 
 bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
 	Volume->setVoxel(pos, Data);
-    return true;
+	return true;
 }
 
 void UBasicVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
@@ -96,8 +90,7 @@ void UBasicVolume::Internal_SetSize(const FRegion& Region, bool New)
 	{
 		Volume.reset(nullptr);
 	}
-
-	Resize(Region);
+	ResizeRegion(Region);
 }
 
 FRegion UBasicVolume::GetEnclosingRegion() const
@@ -105,7 +98,12 @@ FRegion UBasicVolume::GetEnclosingRegion() const
 	return FRegion(Volume->getEnclosingRegion());
 }
 
-void UBasicVolume::Resize(const FRegion& NewRegion)
+void UBasicVolume::Resize(const FIntVector& NewSize)
+{
+	ResizeRegion(FRegion(0, 0, 0, NewSize.X, NewSize.Y, NewSize.Z));
+}
+
+void UBasicVolume::ResizeRegion(const FRegion& NewRegion)
 {
 	if (IsValid())
 	{

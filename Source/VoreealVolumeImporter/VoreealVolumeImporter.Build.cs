@@ -5,7 +5,7 @@ public class VoreealVolumeImporter : ModuleRules
 {
     private string ModulePath
     {
-        get { return Path.GetDirectoryName(RulesCompiler.GetModuleFilename(this.GetType().Name)); }
+        get { return ModuleDirectory; }
     }
 
     private string PolyVoxPath
@@ -23,7 +23,6 @@ public class VoreealVolumeImporter : ModuleRules
                 "CoreUObject",
                 "Engine",
                 "UnrealEd",
-                
                 "Voreeal",
                 "VoreealEditor"
             });

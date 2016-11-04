@@ -19,7 +19,7 @@ public:
 #if WITH_EDITOR
 	virtual void CheckForErrors() override;
 	virtual bool GetReferencedContentObjects(TArray<UObject*>& Objects) const override;
-#endif // WITH_EDITOR	
+#endif 	
 	// End AActor Interface
 
 protected:

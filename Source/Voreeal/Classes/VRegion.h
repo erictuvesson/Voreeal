@@ -44,14 +44,31 @@ struct VOREEAL_API FRegion
 		: X(Lower.X), Y(Lower.Y), Z(Lower.Z)
 		, Width(Lower.X - Upper.X), Height(Lower.Y - Upper.Y), Depth(Lower.Z - Upper.Z)
 	{ }
-    
+
+	FORCEINLINE FRegion(FIntVector Lower, FIntVector Upper)
+		: X(Lower.X), Y(Lower.Y), Z(Lower.Z)
+		, Width(Lower.X - Upper.X), Height(Lower.Y - Upper.Y), Depth(Lower.Z - Upper.Z)
+	{ }
+
 	FORCEINLINE FRegion(const PolyVox::Region &InRegion)
-    {
-        FRegion::operator=(InRegion);
-    }
+	{
+		FRegion::operator=(InRegion);
+	}
  
+	/// Gets the upper corner.
+	FVector Min() const { return FVector(X, Y, Z); }
+
+	/// Gets the lower corner.
+	FVector Max() const { return FVector(X + Width, Y + Height, Z + Depth); }
+
+	FIntVector GetUpper() const { return FIntVector(X, Y, Z); }
+	FIntVector GetLower() const { return FIntVector(X + Width, Y + Height, Z + Depth); }
+
+	/// Gets the size.
+	FVector Size() const { return FVector(Width, Height, Depth); }
+
 	FORCEINLINE FRegion& operator=(const PolyVox::Region& Other)
-    {
+	{
 		int32 width = Other.getWidthInVoxels();
 		int32 height = Other.getHeightInVoxels();
 		int32 depth = Other.getDepthInVoxels();
@@ -63,8 +80,8 @@ struct VOREEAL_API FRegion
 		this->Height = height;
 		this->Depth = depth;
  
-        return *this;
-    }
+		return *this;
+	}
 
 	explicit FORCEINLINE operator PolyVox::Region() const
 	{ 

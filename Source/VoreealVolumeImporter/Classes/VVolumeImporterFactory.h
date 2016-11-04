@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UnrealEd.h"
+#include "Formats/FileFormat.h"
 #include "VVolumeImporterFactory.generated.h"
 
 UCLASS()
@@ -10,6 +11,8 @@ class VOREEALVOLUMEIMPORTER_API UVVolumeImporterFactory : public UFactory, publi
 
 public:
 	UVVolumeImporterFactory(const class FObjectInitializer& ObjectInitializer);
+
+	virtual ~UVVolumeImporterFactory();
 
 	// UFactory interface
 	virtual FText GetToolTip() const override;
@@ -23,4 +26,7 @@ public:
 	virtual EReimportResult::Type Reimport(UObject* Obj) override;
 	virtual int32 GetPriority() const override;
 	// End of FReimportHandler interface
+
+private:
+	TArray<FVFileFormat*> FileFormats;
 };

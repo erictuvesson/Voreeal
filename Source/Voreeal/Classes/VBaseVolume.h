@@ -3,61 +3,48 @@
 #include <ProceduralMeshComponent.h>
 
 #include "VRegion.h"
-
 #include "VBaseVolume.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FRegion, Region);
 
-USTRUCT(BlueprintType)
-struct VOREEAL_API FProceduralMesh
-{
-	GENERATED_BODY()
-
-	TArray<FVector> Vertices;
-	TArray<int32> Indices;
-	TArray<FVector> Normals;
-	TArray<FVector2D> UVs;
-	TArray<FVector> Colors;
-	TArray<FProcMeshTangent> Tangents;
-};
-
-UENUM(BlueprintType)
-enum class EVolumeExtractType : uint8
-{
-	ColoredCubes,
-	MarchingCubes
-};
-
+/** Base Voxel Volume, used as a data format. */
 UCLASS(Abstract)
 class VOREEAL_API UBaseVolume : public UObject
 {
 	GENERATED_BODY()
 
 public:
-
+	/// Occures when the volume has changed.
 	UPROPERTY(BlueprintAssignable, Category = Voreeal)
 	FVolumeChanged OnChanged;
 
-	UPROPERTY(EditDefaultsOnly, Category = Voreeal)
-	EVolumeExtractType ExtractorType;
-
 public:
+	///// Extract mesh.
+	//UFUNCTION(BlueprintCallable, Category = Voreeal)
+	//virtual void ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
 
-	/// Extract mesh.
+	/// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = Voreeal)
-	virtual void ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
+	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color) {
+		SetVoxel(FVector(X, Y, Z), Color);
+	}
 
-    /// Set Voxel at Location.
+	/// Set Voxel at Location.
+	void SetVoxel(const FIntVector& Location, const FColor& Color) {
+		SetVoxel(FVector(Location.X, Location.Y, Location.Z), Color);
+	}
+
+	/// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = Voreeal)
-    void SetVoxel(const FVector& Location, const FColor& Color);
-    
-    /// Get Voxel at Location.
+	void SetVoxel(const FVector& Location, const FColor& Color);
+	
+	/// Get Voxel at Location.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
-    void GetVoxel(const FVector& Location, FColor& Color);
+	void GetVoxel(const FVector& Location, FColor& Color);
 
 	/// Checks if the volume is valid.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
-    virtual bool IsValid() const;
+	virtual bool IsValid() const;
 
 public:
 	void SerializeVolume(FArchive& Ar, FRegion& Region);

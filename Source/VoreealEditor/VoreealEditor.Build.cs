@@ -24,7 +24,6 @@ public class VoreealEditor : ModuleRules
 				"ContentBrowser",
 				"WorkspaceMenuStructure",
 				"EditorStyle",
-				"MeshPaint",
 				"EditorWidgets",
 				"Projects",
 

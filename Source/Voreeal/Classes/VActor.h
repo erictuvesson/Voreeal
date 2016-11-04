@@ -4,6 +4,7 @@
 
 #include "VActor.generated.h"
 
+/** Voreeal Base Actor, this providers easy methods for converting values. */
 UCLASS(Abstract, HideCategories = (Input, Collision, Replication))
 class VOREEAL_API AVActor : public AActor
 {
@@ -28,19 +29,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
 	void VolumeDirectionToWorldDirection(const FVector& LocalDirection, FVector& Result) const;
 
-
-
+public:
 	/// Along a raycast, get the position of the first non-empty voxel.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
 	virtual bool PickFirstSolidVoxel(const FVector& LocalStartPosition, const FVector& LocalDirection, FVector& VoxelLocation) const;
 
 	/// Along a raycast, get the position of the last non-empty voxel.
-    UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
-    virtual bool PickLastSolidVoxel(const FVector& LocalStartPosition, const FVector& LocalDirection, FVector& VoxelLocation) const;
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
+	virtual bool PickLastSolidVoxel(const FVector& LocalStartPosition, const FVector& LocalDirection, FVector& VoxelLocation) const;
 
 /*
 	/// Create a region actor from this volume.
 	UFUNCTION(BlueprintCallable, Category = Voreeal)
-    virtual bool CreateRegionActor(const FRegion& Region, class ARegionVolumeActor* RegionActor);
+	virtual bool CreateRegionActor(const FRegion& Region, class ARegionVolumeActor* RegionActor);
 */
 };

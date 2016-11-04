@@ -27,17 +27,14 @@ void AVActor::VolumeDirectionToWorldDirection(const FVector& localDirection, FVe
 	result = ActorToWorld().TransformVectorNoScale(localDirection);
 }
 
-
-
-
 bool AVActor::PickFirstSolidVoxel(const FVector& LocalStartPosition, const FVector& LocalDirection, FVector& VoxelLocation) const
 {
-	// TODO: 
+	// TODO: Raycast
 	return false;
 }
 
 bool AVActor::PickLastSolidVoxel(const FVector& LocalStartPosition, const FVector& LocalDirection, FVector& VoxelLocation) const
 {
-	// TODO: 
+	// TODO: Raycast
 	return false;
 }

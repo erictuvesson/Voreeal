@@ -6,12 +6,10 @@
 #include "MapErrors.h"
 
 ABasicVolumeActor::ABasicVolumeActor(const class FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	BasicVolumeComponent = CreateDefaultSubobject<UBasicVolumeComponent>(TEXT("BasicVolumeComponent"));
-	//BasicVolumeComponent->SetCollisionProfileName(UCollisionProfile::BlockAll_ProfileName);
 	BasicVolumeComponent->Mobility = EComponentMobility::Static;
-	//BasicVolumeComponent->bGenerateOverlapEvents = false;
 
 	RootComponent = BasicVolumeComponent;
 }

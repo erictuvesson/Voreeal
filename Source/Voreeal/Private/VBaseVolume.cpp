@@ -1,31 +1,26 @@
 #include "VoreealPrivatePCH.h"
 #include "VBaseVolume.h"
 
-void UBaseVolume::ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh)
-{
-    // This is "required" to be abstract thanks to PolyVox.
-    check(0 && "abstract");
-}
-
 void UBaseVolume::SetVoxel(const FVector& Location, const FColor& Color)
 {
 	// TODO: Check if valid? Currently not doing because of performance.
+
 	uint32 data = 
 		(Color.R) | 
 		(Color.G) << 8 |
 		(Color.B) << 16 |
 		(Color.A) << 24;
-        
-    // TODO: Return?
-    Internal_SetVoxel(Location, data);
+		
+	Internal_SetVoxel(Location, data);
 }
 
 void UBaseVolume::GetVoxel(const FVector& Location, FColor& Color)
 {
 	// TODO: Check if valid? Currently not doing because of performance.
-    uint32 data;
-    Internal_GetVoxel(Location, data);
-    
+
+	uint32 data;
+	Internal_GetVoxel(Location, data);
+	
 	Color.R = (data & 0x000000FF);
 	Color.G = (data & 0x0000FF00) >> 8;
 	Color.B = (data & 0x00FF0000) >> 16;
@@ -34,19 +29,19 @@ void UBaseVolume::GetVoxel(const FVector& Location, FColor& Color)
 
 bool UBaseVolume::IsValid() const
 {
-    check(0 && "abstract");
-    return false;
+	check(0 && "abstract");
+	return false;
 }
 
 bool UBaseVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
 {
-    check(0 && "abstract");
-    return false;
+	check(0 && "abstract");
+	return false;
 }
 
 void UBaseVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
 {
-    check(0 && "abstract");
+	check(0 && "abstract");
 }
 
 void UBaseVolume::Internal_SetSize(const FRegion& Region, bool New)

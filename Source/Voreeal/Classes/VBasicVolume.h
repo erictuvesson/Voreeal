@@ -3,18 +3,21 @@
 #include <PolyVox/RawVolume.h>
 
 #include "VBaseVolume.h"
-
 #include "VBasicVolume.generated.h"
 
+/**
+ * Basic Voxel Volume;
+ *	Enclosed volume with just basic LOD.
+ */
 UCLASS(Blueprintable, meta = (DisplayThumbnail = "true"))
 class VOREEAL_API UBasicVolume : public UBaseVolume
 {
-    GENERATED_BODY()
-    
+	GENERATED_BODY()
+	
 public:
-    
-    typedef PolyVox::RawVolume<uint32> VolumeType;
-    
+	typedef uint32 VoxelType;
+	typedef PolyVox::RawVolume<VoxelType> VolumeType;
+	
 public:
 	UBasicVolume(const class FObjectInitializer& ObjectInitializer);
 
@@ -27,21 +30,23 @@ public:
 #endif
 	// End UObject Interface
 
-    // Begin UBaseVolume Interface
-	virtual void ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh) override;
-    virtual bool IsValid() const override;
-    // End UBaseVolume Interface
-    
-    /// Gets the enclosing region.
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
-    FRegion GetEnclosingRegion() const;
+	// Begin UBaseVolume Interface
+	virtual bool IsValid() const override;
+	// End UBaseVolume Interface
+	
+	/// Gets the enclosing region.
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
+	FRegion GetEnclosingRegion() const;
 
 	/// Resize the volume.
-	UFUNCTION(BlueprintCallable, Category = Voreeal)
-	void Resize(const FRegion& NewRegion);
+	UFUNCTION(BlueprintCallable, Category = "Voreeal")
+	void Resize(const FIntVector& NewSize);
+
+	/// Resize the volume.
+	UFUNCTION(BlueprintCallable, Category = "Voreeal")
+	void ResizeRegion(const FRegion& NewRegion);
 
 public:
-
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(Category = ImportSettings, VisibleAnywhere, Instanced)
 	class UAssetImportData* AssetImportData;
@@ -54,7 +59,7 @@ protected:
 	virtual void Internal_SetSize(const FRegion& Region, bool New);
 
 private:
-    std::unique_ptr<VolumeType> Volume;
+	std::unique_ptr<VolumeType> Volume;
 
 	UPROPERTY()
 	TArray<uint8> ImportedData;

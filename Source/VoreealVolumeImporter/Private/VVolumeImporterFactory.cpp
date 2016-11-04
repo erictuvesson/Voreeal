@@ -1,8 +1,10 @@
 #include "VoreealVolumeImporterPrivatePCH.h"
 #include "VVolumeImporterFactory.h"
 
-#include "VImporters.h"
 #include "VBasicVolume.h"
+
+#include "Formats/MagicaVoxelFileFormat.h"
+#include "Formats/QubicleBinaryFileFormat.h"
 
 #include <AssetToolsModule.h>
 #include <AssetRegistryModule.h>
@@ -15,17 +17,27 @@ UVVolumeImporterFactory::UVVolumeImporterFactory(const FObjectInitializer& Objec
 	: Super(ObjectInitializer)
 {
 	bCreateNew = false;
-	//bEditAfterNew = true;
 	SupportedClass = UBasicVolume::StaticClass();
 
 	bEditorImport = true;
 	bText = true;
 
-	Formats.Add(TEXT("qb;Qubicle Binary"));
-	Formats.Add(TEXT("vox;MagicaVoxel"));
-	//Formats.Add(TEXT("vox;Voxlap"));
-	//Formats.Add(TEXT("kv6;Voxlap"));
-	//Formats.Add(TEXT("3mp;Paint3D"));
+	FileFormats.Add(new FMagicaVoxelFileFormat());
+	FileFormats.Add(new FQubicleBinaryFileFormat());
+
+	for (auto fileFormat : FileFormats)
+	{
+		FString text = FString::Printf(TEXT("%s;%s"), *fileFormat->GetExtension(), *fileFormat->GetFileDescription());
+		Formats.Add(text);
+	}
+}
+
+UVVolumeImporterFactory::~UVVolumeImporterFactory()
+{
+	for (auto fileFormat : FileFormats)
+	{
+		delete fileFormat;
+	}
 }
 
 FText UVVolumeImporterFactory::GetToolTip() const
@@ -35,10 +47,32 @@ FText UVVolumeImporterFactory::GetToolTip() const
 
 bool UVVolumeImporterFactory::FactoryCanImport(const FString& Filename)
 {
-	return Voreeal::Import(Filename) != nullptr;
+	TArray<uint8> TheBinaryArray;
+	if (!FFileHelper::LoadFileToArray(TheBinaryArray, *Filename))
+	{
+		return false;
+	}
+
+	FString FilenameExtension = FPaths::GetExtension(Filename);
+	FString ErrorMessage;
+
+	for (auto fileFormat : FileFormats)
+	{
+		if (fileFormat->GetExtension() == FilenameExtension)
+		{
+			FMemoryReader Ar = FMemoryReader(TheBinaryArray, true);
+			if (fileFormat->IsFile(Ar, ErrorMessage))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
-UObject* UVVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
+UObject* UVVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, 
+	const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
 {
 	Flags |= RF_Transactional;
 
@@ -46,9 +80,45 @@ UObject* UVVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* In
 
 	UBasicVolume* Result = NewObject<UBasicVolume>(InParent, InName, Flags);
 
-	auto polyVoxVolume = Voreeal::Import(UFactory::GetCurrentFilename());
+	FString FilenameExtension = FPaths::GetExtension(CurrentFilename);
 
-	Result->Volume.reset(polyVoxVolume);
+	TArray<uint8> TheBinaryArray;
+	if (!FFileHelper::LoadFileToArray(TheBinaryArray, *CurrentFilename))
+	{
+		UE_LOG(LogVoreealVolumeImporter, Error, TEXT("Invalid File"));
+		return nullptr;
+	}
+
+	FString ErrorMessage;
+	bool Success = false;
+
+	for (auto fileFormat : FileFormats)
+	{
+		if (fileFormat->GetExtension() == FilenameExtension)
+		{
+			FMemoryReader IsAr = FMemoryReader(TheBinaryArray, true);
+			if (fileFormat->IsFile(IsAr, ErrorMessage))
+			{
+				// TODO: Reset memory reader position instead
+				FMemoryReader Ar = FMemoryReader(TheBinaryArray, true);
+				if (fileFormat->ReadFile(Ar, Result, ErrorMessage))
+				{
+					Success = true;
+				}
+				else
+				{
+					FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(ErrorMessage));
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	if (!Success)
+	{
+		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Found no suitable importer!")));
+		return nullptr;
+	}
 
 	FBufferArchive Ar;
 	// TODO: !!!
@@ -95,20 +165,55 @@ void UVVolumeImporterFactory::SetReimportPaths(UObject* Obj, const TArray<FStrin
 
 EReimportResult::Type UVVolumeImporterFactory::Reimport(UObject* Obj)
 {
-	if (UBasicVolume* volume = Cast<UBasicVolume>(Obj))
+	if (UBasicVolume* Volume = Cast<UBasicVolume>(Obj))
 	{
-		auto Filename = volume->AssetImportData->GetFirstFilename();
+		FString Filename = Volume->AssetImportData->GetFirstFilename();
+		FString FilenameExtension = FPaths::GetExtension(Filename);
 
-		auto polyVoxVolume = Voreeal::Import(Filename);
+		TArray<uint8> TheBinaryArray;
+		if (!FFileHelper::LoadFileToArray(TheBinaryArray, *CurrentFilename))
+		{
+			UE_LOG(LogVoreealVolumeImporter, Error, TEXT("Invalid File"));
+			return EReimportResult::Failed;
+		}
 
-		volume->Volume.reset(polyVoxVolume);
+		FString ErrorMessage;
+		bool Success = false;
 
-		FMemoryWriter MemoryWriter{ volume->ImportedData, true };
+		for (auto fileFormat : FileFormats)
+		{
+			if (fileFormat->GetExtension() == FilenameExtension)
+			{
+				FMemoryReader IsAr = FMemoryReader(TheBinaryArray, true);
+				if (fileFormat->IsFile(IsAr, ErrorMessage))
+				{
+					// TODO: Reset memory reader position instead
+					FMemoryReader Ar = FMemoryReader(TheBinaryArray, true);
+					if (fileFormat->ReadFile(Ar, Volume, ErrorMessage))
+					{
+						Success = true;
+					}
+					else
+					{
+						FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(ErrorMessage));
+						return EReimportResult::Failed;
+					}
+				}
+			}
+		}
+
+		if (!Success)
+		{
+			FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Found no suitable importer!")));
+			return EReimportResult::Failed;
+		}
+
+		FMemoryWriter MemoryWriter{ Volume->ImportedData, true };
 		FArchive Ar{ MemoryWriter };
 		// TODO: !!!
 		//Voreeal::Export(polyVoxVolume, Ar);
 
-		volume->PostEditChange();
+		Volume->PostEditChange();
 
 		return EReimportResult::Succeeded;
 	}
