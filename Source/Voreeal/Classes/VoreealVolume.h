@@ -2,14 +2,14 @@
 
 #include <ProceduralMeshComponent.h>
 
-#include "VRegion.h"
-#include "VBaseVolume.generated.h"
+#include "VoreealRegion.h"
+#include "VoreealVolume.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FRegion, Region);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FVoreealRegion, Region);
 
 /** Base Voxel Volume, used as a data format. */
 UCLASS(Abstract)
-class VOREEAL_API UBaseVolume : public UObject
+class VOREEAL_API UVoreealVolume : public UObject
 {
 	GENERATED_BODY()
 
@@ -21,7 +21,7 @@ public:
 public:
 	///// Extract mesh.
 	//UFUNCTION(BlueprintCallable, Category = Voreeal)
-	//virtual void ExtractMesh(const FRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
+	//virtual void ExtractMesh(const FVoreealRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
 
 	/// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = Voreeal)
@@ -47,11 +47,11 @@ public:
 	virtual bool IsValid() const;
 
 public:
-	void SerializeVolume(FArchive& Ar, FRegion& Region);
+	void SerializeVolume(FArchive& Ar, FVoreealRegion& Region);
 	void DeserializeVolume(FArchive& Ar);
 
 protected:
 	virtual bool Internal_SetVoxel(const FVector& Location, const uint32& Data);
 	virtual void Internal_GetVoxel(const FVector& Location, uint32& Data);
-	virtual void Internal_SetSize(const FRegion& Region, bool New);
+	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 };

@@ -2,16 +2,16 @@
 
 #include <GameFramework/Actor.h>
 
-#include "VActor.generated.h"
+#include "VoreealActor.generated.h"
 
 /** Voreeal Base Actor, this providers easy methods for converting values. */
 UCLASS(Abstract, HideCategories = (Input, Collision, Replication))
-class VOREEAL_API AVActor : public AActor
+class VOREEAL_API AVoreealActor : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AVActor(const class FObjectInitializer& ObjectInitializer);
+	AVoreealActor(const class FObjectInitializer& ObjectInitializer);
 	
 	/// Convert from world-space to volume-space
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
@@ -41,6 +41,6 @@ public:
 /*
 	/// Create a region actor from this volume.
 	UFUNCTION(BlueprintCallable, Category = Voreeal)
-	virtual bool CreateRegionActor(const FRegion& Region, class ARegionVolumeActor* RegionActor);
+	virtual bool CreateRegionActor(const FVoreealRegion& Region, class ARegionVolumeActor* RegionActor);
 */
 };

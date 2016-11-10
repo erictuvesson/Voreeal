@@ -1,18 +1,18 @@
 #include "VoreealEditorPrivatePCH.h"
-#include "VActorFactory.h"
+#include "VoreealActorFactory.h"
 
-#include "VBasicVolumeActor.h"
+#include "VoreealBasicVolumeActor.h"
 
 #define LOCTEXT_NAMESPACE "Voreeal"
 
-UVActorFactory::UVActorFactory(const FObjectInitializer& ObjectInitializer)
+UVoreealActorFactory::UVoreealActorFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	DisplayName = NSLOCTEXT("Voreeal", "VoreealFactoryDisplayName", "Add Voxel Volume");
 	NewActorClass = ABasicVolumeActor::StaticClass();
 }
 
-void UVActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
+void UVoreealActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
 {
 	Super::PostSpawnActor(Asset, NewActor);
 
@@ -23,7 +23,7 @@ void UVActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
 	}
 }
 
-void UVActorFactory::PostCreateBlueprint(UObject* Asset, AActor* CDO)
+void UVoreealActorFactory::PostCreateBlueprint(UObject* Asset, AActor* CDO)
 {
 	if (UBasicVolume* VoxelVolume = Cast<UBasicVolume>(Asset))
 	{
@@ -34,7 +34,7 @@ void UVActorFactory::PostCreateBlueprint(UObject* Asset, AActor* CDO)
 	}
 }
 
-bool UVActorFactory::CanCreateActorFrom(const FAssetData& AssetData, FText& OutErrorMsg)
+bool UVoreealActorFactory::CanCreateActorFrom(const FAssetData& AssetData, FText& OutErrorMsg)
 {
 	if (AssetData.IsValid() && AssetData.GetClass()->IsChildOf(UBasicVolume::StaticClass()))
 	{

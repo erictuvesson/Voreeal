@@ -1,8 +1,8 @@
 #include "VoreealPrivatePCH.h"
-#include "VBasicVolumeComponent.h"
+#include "VoreealBasicVolumeComponent.h"
+#include "VoreealBlueprintLibrary.h"
 
 #include "MessageLog.h"
-#include "VBlueprintLibrary.h"
 
 UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -75,7 +75,7 @@ void UBasicVolumeComponent::DrawDebugOctree(const FColor& Color, float Duration,
 				return ETraverseOptions::Continue;
 			}
 
-			UVBlueprintLibrary::DrawDebugRegion(this, this->GetComponentTransform(), node->m_bounds, Color, Duration, Thickness);
+			UVoreealBlueprintLibrary::DrawDebugRegion(this, this->GetComponentTransform(), node->m_bounds, Color, Duration, Thickness);
 
 			return ETraverseOptions::Skip;
 		});

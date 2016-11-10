@@ -2,11 +2,11 @@
 
 #include <PolyVox/Region.h>
 
-#include "VRegion.generated.h"
+#include "VoreealRegion.generated.h"
 
 /// Defines a region within a volume.
 USTRUCT(BlueprintType)
-struct VOREEAL_API FRegion
+struct VOREEAL_API FVoreealRegion
 {
 	GENERATED_BODY()
 
@@ -28,31 +28,31 @@ struct VOREEAL_API FRegion
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Depth;
 
-	FORCEINLINE FRegion()
+	FORCEINLINE FVoreealRegion()
 		: X(0), Y(0), Z(0), Width(0), Height(0), Depth(0)
 	{ }
 
-	FORCEINLINE FRegion(int32 X, int32 Y, int32 Z, int32 Width, int32 Height, int32 Depth)
+	FORCEINLINE FVoreealRegion(int32 X, int32 Y, int32 Z, int32 Width, int32 Height, int32 Depth)
 		: X(X), Y(Y), Z(Z), Width(Width), Height(Height), Depth(Depth)
 	{ }
 
-	explicit FORCEINLINE FRegion(FVector Upper)
-		: FRegion(FVector::ZeroVector, Upper)
+	explicit FORCEINLINE FVoreealRegion(FVector Upper)
+		: FVoreealRegion(FVector::ZeroVector, Upper)
 	{ }
 
-	FORCEINLINE FRegion(FVector Lower, FVector Upper)
+	FORCEINLINE FVoreealRegion(FVector Lower, FVector Upper)
 		: X(Lower.X), Y(Lower.Y), Z(Lower.Z)
 		, Width(Lower.X - Upper.X), Height(Lower.Y - Upper.Y), Depth(Lower.Z - Upper.Z)
 	{ }
 
-	FORCEINLINE FRegion(FIntVector Lower, FIntVector Upper)
+	FORCEINLINE FVoreealRegion(FIntVector Lower, FIntVector Upper)
 		: X(Lower.X), Y(Lower.Y), Z(Lower.Z)
 		, Width(Lower.X - Upper.X), Height(Lower.Y - Upper.Y), Depth(Lower.Z - Upper.Z)
 	{ }
 
-	FORCEINLINE FRegion(const PolyVox::Region &InRegion)
+	FORCEINLINE FVoreealRegion(const PolyVox::Region &InRegion)
 	{
-		FRegion::operator=(InRegion);
+		FVoreealRegion::operator=(InRegion);
 	}
  
 	/// Gets the upper corner.
@@ -67,7 +67,7 @@ struct VOREEAL_API FRegion
 	/// Gets the size.
 	FVector Size() const { return FVector(Width, Height, Depth); }
 
-	FORCEINLINE FRegion& operator=(const PolyVox::Region& Other)
+	FORCEINLINE FVoreealRegion& operator=(const PolyVox::Region& Other)
 	{
 		int32 width = Other.getWidthInVoxels();
 		int32 height = Other.getHeightInVoxels();
@@ -88,7 +88,7 @@ struct VOREEAL_API FRegion
 		return PolyVox::Region(X, Y, Z, X + Width, Y + Height, Z + Depth);
 	}
 
-	FORCEINLINE friend FArchive& operator<<(FArchive& Ar, FRegion& Region)
+	FORCEINLINE friend FArchive& operator<<(FArchive& Ar, FVoreealRegion& Region)
 	{
 		Ar << Region.X << Region.Y << Region.Z;
 		Ar << Region.Width << Region.Height << Region.Depth;

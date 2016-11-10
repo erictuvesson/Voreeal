@@ -1,14 +1,15 @@
 #pragma once
 
-#include "VActor.h"
-#include "VBasicVolumeComponent.h"
-#include "VBasicVolumeActor.generated.h"
+#include "VoreealActor.h"
+#include "VoreealBasicVolumeComponent.h"
+#include "VoreealBasicVolumeActor.generated.h"
 
 UCLASS(ComponentWrapperClass)
-class VOREEAL_API ABasicVolumeActor : public AVActor
+class VOREEAL_API ABasicVolumeActor : public AVoreealActor
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Voreeal, meta = (ExposeFunctionCategories = "Mesh,Rendering,Physics,Components|StaticMesh", AllowPrivateAccess = "true"))
 	UBasicVolumeComponent* BasicVolumeComponent;
 

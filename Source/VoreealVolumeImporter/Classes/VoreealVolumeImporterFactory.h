@@ -2,17 +2,17 @@
 
 #include "UnrealEd.h"
 #include "Formats/FileFormat.h"
-#include "VVolumeImporterFactory.generated.h"
+#include "VoreealVolumeImporterFactory.generated.h"
 
 UCLASS()
-class VOREEALVOLUMEIMPORTER_API UVVolumeImporterFactory : public UFactory, public FReimportHandler
+class VOREEALVOLUMEIMPORTER_API UVoreealVolumeImporterFactory : public UFactory, public FReimportHandler
 {
 	GENERATED_BODY()
 
 public:
-	UVVolumeImporterFactory(const class FObjectInitializer& ObjectInitializer);
+	UVoreealVolumeImporterFactory(const class FObjectInitializer& ObjectInitializer);
 
-	virtual ~UVVolumeImporterFactory();
+	virtual ~UVoreealVolumeImporterFactory();
 
 	// UFactory interface
 	virtual FText GetToolTip() const override;

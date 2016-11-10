@@ -1,7 +1,7 @@
 #include "VoreealVolumeImporterPrivatePCH.h"
-#include "VVolumeImporterFactory.h"
+#include "VoreealVolumeImporterFactory.h"
 
-#include "VBasicVolume.h"
+#include "VoreealBasicVolume.h"
 
 #include "Formats/MagicaVoxelFileFormat.h"
 #include "Formats/QubicleBinaryFileFormat.h"
@@ -13,7 +13,7 @@
 
 #define LOCTEXT_NAMESPACE "VoreealEditor"
 
-UVVolumeImporterFactory::UVVolumeImporterFactory(const FObjectInitializer& ObjectInitializer)
+UVoreealVolumeImporterFactory::UVoreealVolumeImporterFactory(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	bCreateNew = false;
@@ -32,7 +32,7 @@ UVVolumeImporterFactory::UVVolumeImporterFactory(const FObjectInitializer& Objec
 	}
 }
 
-UVVolumeImporterFactory::~UVVolumeImporterFactory()
+UVoreealVolumeImporterFactory::~UVoreealVolumeImporterFactory()
 {
 	for (auto fileFormat : FileFormats)
 	{
@@ -40,12 +40,12 @@ UVVolumeImporterFactory::~UVVolumeImporterFactory()
 	}
 }
 
-FText UVVolumeImporterFactory::GetToolTip() const
+FText UVoreealVolumeImporterFactory::GetToolTip() const
 {
-	return LOCTEXT("UVVolumeImporterFactoryDescription", "Voreeal Volumes");
+	return LOCTEXT("UVoreealVolumeImporterFactoryDescription", "Voreeal Volumes");
 }
 
-bool UVVolumeImporterFactory::FactoryCanImport(const FString& Filename)
+bool UVoreealVolumeImporterFactory::FactoryCanImport(const FString& Filename)
 {
 	TArray<uint8> TheBinaryArray;
 	if (!FFileHelper::LoadFileToArray(TheBinaryArray, *Filename))
@@ -71,7 +71,7 @@ bool UVVolumeImporterFactory::FactoryCanImport(const FString& Filename)
 	return false;
 }
 
-UObject* UVVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, 
+UObject* UVoreealVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, 
 	const TCHAR* Type, const TCHAR*& Buffer, const TCHAR* BufferEnd, FFeedbackContext* Warn)
 {
 	Flags |= RF_Transactional;
@@ -135,7 +135,7 @@ UObject* UVVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObject* In
 	return Result;
 }
 
-bool UVVolumeImporterFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
+bool UVoreealVolumeImporterFactory::CanReimport(UObject* Obj, TArray<FString>& OutFilenames)
 {
 	if (UBasicVolume* volume = Cast<UBasicVolume>(Obj))
 	{
@@ -152,7 +152,7 @@ bool UVVolumeImporterFactory::CanReimport(UObject* Obj, TArray<FString>& OutFile
 	return false;
 }
 
-void UVVolumeImporterFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& NewReimportPaths)
+void UVoreealVolumeImporterFactory::SetReimportPaths(UObject* Obj, const TArray<FString>& NewReimportPaths)
 {
 	if (UBasicVolume* volume = Cast<UBasicVolume>(Obj))
 	{
@@ -163,7 +163,7 @@ void UVVolumeImporterFactory::SetReimportPaths(UObject* Obj, const TArray<FStrin
 	}
 }
 
-EReimportResult::Type UVVolumeImporterFactory::Reimport(UObject* Obj)
+EReimportResult::Type UVoreealVolumeImporterFactory::Reimport(UObject* Obj)
 {
 	if (UBasicVolume* Volume = Cast<UBasicVolume>(Obj))
 	{
@@ -220,7 +220,7 @@ EReimportResult::Type UVVolumeImporterFactory::Reimport(UObject* Obj)
 	return EReimportResult::Failed;
 }
 
-int32 UVVolumeImporterFactory::GetPriority() const
+int32 UVoreealVolumeImporterFactory::GetPriority() const
 {
 	return ImportPriority;
 }

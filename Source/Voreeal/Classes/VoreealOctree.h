@@ -1,12 +1,12 @@
 #pragma once
 
-#include "VRegion.h"
+#include "VoreealRegion.h"
 
 #include <Future.h>
 #include <PolyVox/RawVolume.h>
 
 class UProceduralMeshComponent;
-class UBaseVolume;
+class UVoreealVolume;
 class UBasicVolume;
 
 class FNodeTask;
@@ -59,7 +59,7 @@ struct FSparseOctreeNode
 	FSparseOctree* m_root;
 
 	/// The bounds of this node.
-	FRegion m_bounds;
+	FVoreealRegion m_bounds;
 
 	/// The current depth of this node. (this is in reverse)
 	int32 m_depth;
@@ -73,7 +73,7 @@ struct FSparseOctreeNode
 	//FTimespan m_nodeOrChildrenLastChanged;
 
 	/// Constructor
-	FSparseOctreeNode(FRegion region, int32 parentId, FSparseOctree* root);
+	FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root);
 
 	/// Gets if the mesh is up to date.
 	FORCEINLINE bool IsUpToDate() const 
@@ -108,8 +108,8 @@ public:
 		const EOctreeConstructionModes& constMode);
 
 	/// Constructor
-	FSparseOctree(UBaseVolume* volume, UProceduralMeshComponent* meshComponent, 
-		const FRegion& region, const EOctreeConstructionModes& constMode);
+	FSparseOctree(UVoreealVolume* volume, UProceduralMeshComponent* meshComponent, 
+		const FVoreealRegion& region, const EOctreeConstructionModes& constMode);
 
 	/// Destructor
 	virtual ~FSparseOctree();
@@ -121,7 +121,7 @@ public:
 	FSparseOctreeNode* GetNodeAt(int32 index);
 
 	/// Gets the octree region.
-	FRegion GetRegion() const;
+	FVoreealRegion GetRegion() const;
 
 	/// Gets the max depth of the octree.
 	int32 GetMaxDepth() const;
@@ -145,7 +145,7 @@ public:
 	void MarkChange(const FIntVector& position, const FTimespan& changeTime);
 
 	/// Mark a change in the region.
-	void MarkChange(const FRegion& region, const FTimespan& changeTime);
+	void MarkChange(const FVoreealRegion& region, const FTimespan& changeTime);
 	
 	/// Update the octree from the players viewpoint. 
 	/// \return true if up to date
@@ -153,23 +153,23 @@ public:
 
 private:
 	/// Create a new node.
-	int32 CreateNode(FRegion region, int32 parentId);
+	int32 CreateNode(FVoreealRegion region, int32 parentId);
 
 	/// Build all parent nodes.
 	void BuildNode(int32 parentId);
 
 	/// Mark a change in the region.
-	void MarkChange(const int32& index, const FRegion& region, const FTimespan& changeTime);
+	void MarkChange(const int32& index, const FVoreealRegion& region, const FTimespan& changeTime);
 
 private:
 	UProceduralMeshComponent* m_meshComponent;
-	UBaseVolume* m_volume;
+	UVoreealVolume* m_volume;
 	TArray<TSharedPtr<FSparseOctreeTask>> m_tasks;
 
 	// Octree
 	TArray<FSparseOctreeNode*> m_children;
 	int32 m_rootId, m_maxDepth;
-	FRegion m_bounds;
+	FVoreealRegion m_bounds;
 	EOctreeConstructionModes m_constMode;
 };
 

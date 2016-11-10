@@ -1,16 +1,16 @@
 #include "VoreealPrivatePCH.h"
-#include "VOctree.h"
+#include "VoreealOctree.h"
 
-#include "VBaseVolume.h"
-#include "VBasicVolume.h"
-#include "VBlueprintLibrary.h"
+#include "VoreealVolume.h"
+#include "VoreealBasicVolume.h"
+#include "VoreealBlueprintLibrary.h"
 
 /// 
 /// Parts of this code is based on Cubiquity's Octree
 /// https://bitbucket.org/volumesoffun/cubiquity
 /// 
 
-FSparseOctreeNode::FSparseOctreeNode(FRegion region, int32 parentId, FSparseOctree* root)
+FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root)
 	: m_selfId(InvalidNodeIndex)
 	, m_parentId(parentId)
 	, m_hasChildren(false)
@@ -31,8 +31,8 @@ FSparseOctree::FSparseOctree(UBasicVolume* volume, UProceduralMeshComponent* mes
 
 }
 
-FSparseOctree::FSparseOctree(UBaseVolume* volume, UProceduralMeshComponent* meshComponent, 
-	const FRegion& region, const EOctreeConstructionModes& constMode)
+FSparseOctree::FSparseOctree(UVoreealVolume* volume, UProceduralMeshComponent* meshComponent, 
+	const FVoreealRegion& region, const EOctreeConstructionModes& constMode)
 	: m_rootId(FSparseOctreeNode::InvalidNodeIndex)
 	, m_bounds(region)
 	, m_volume(m_volume)
@@ -41,12 +41,12 @@ FSparseOctree::FSparseOctree(UBaseVolume* volume, UProceduralMeshComponent* mesh
 {
 	if (constMode == EOctreeConstructionModes::BoundVoxels)
 	{
-		UVBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
+		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
 	}
 	else if (constMode == EOctreeConstructionModes::BoundCells)
 	{
-		UVBlueprintLibrary::ShiftUpperCorner(m_bounds, -1, -1, -1, m_bounds);
-		UVBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
+		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, -1, -1, -1, m_bounds);
+		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
 	}
 
 	int32 width = (constMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Width  : m_bounds.Width + 1;
@@ -67,7 +67,7 @@ FSparseOctree::FSparseOctree(UBaseVolume* volume, UProceduralMeshComponent* mesh
 	int32 heightInc = octreeTargetSize - height;
 	int32 depthInc = octreeTargetSize - depth;
 
-	FRegion octreeRegion(m_bounds);
+	FVoreealRegion octreeRegion(m_bounds);
 
 	if (widthInc % 2 == 1)
 	{
@@ -90,7 +90,7 @@ FSparseOctree::FSparseOctree(UBaseVolume* volume, UProceduralMeshComponent* mesh
 		depthInc--;
 	}
 
-	UVBlueprintLibrary::Grow(octreeRegion, widthInc / 2, heightInc / 2, depthInc / 2, octreeRegion);
+	UVoreealBlueprintLibrary::Grow(octreeRegion, widthInc / 2, heightInc / 2, depthInc / 2, octreeRegion);
 
 	m_rootId = CreateNode(octreeRegion, FSparseOctreeNode::InvalidNodeIndex);
 	m_children[m_rootId]->m_depth = m_maxDepth - 1;
@@ -116,7 +116,7 @@ FSparseOctreeNode* FSparseOctree::GetNodeAt(int32 index)
 	return m_children[index];
 }
 
-FRegion FSparseOctree::GetRegion() const
+FVoreealRegion FSparseOctree::GetRegion() const
 {
 	return m_bounds;
 }
@@ -133,10 +133,10 @@ int32 FSparseOctree::GetCount() const
 
 void FSparseOctree::MarkChange(const FIntVector& position, const FTimespan& changeTime)
 {
-	MarkChange(m_rootId, FRegion(position.X, position.Y, position.Z, 1, 1, 1), changeTime);
+	MarkChange(m_rootId, FVoreealRegion(position.X, position.Y, position.Z, 1, 1, 1), changeTime);
 }
 
-void FSparseOctree::MarkChange(const FRegion& region, const FTimespan& changeTime)
+void FSparseOctree::MarkChange(const FVoreealRegion& region, const FTimespan& changeTime)
 {
 	MarkChange(m_rootId, region, changeTime);
 }
@@ -191,7 +191,7 @@ bool FSparseOctree::Update(const FVector& viewPosition)
 	return true;
 }
 
-int32 FSparseOctree::CreateNode(FRegion region, int32 parent)
+int32 FSparseOctree::CreateNode(FVoreealRegion region, int32 parent)
 {
 	auto node = new FSparseOctreeNode(region, parent, this);
 
@@ -229,7 +229,7 @@ void FSparseOctree::BuildNode(int32 parentId)
 
 		for (int i = 0; i < FSparseOctreeNode::ChildrenCount; i++)
 		{
-			FRegion childRegion;
+			FVoreealRegion childRegion;
 			childRegion.X = (i % 2 == 0 ? min.X : center.X);
 			childRegion.Y = ((i < 2 || i == 4 || i == 5) ? min.Y : center.Y);
 			childRegion.Z = (i < 4 ? min.Z : center.Z);
@@ -237,7 +237,7 @@ void FSparseOctree::BuildNode(int32 parentId)
 			childRegion.Height = ((i < 2 || i == 4 || i == 5) ? center.Y : max.Y);
 			childRegion.Depth = (i < 4 ? center.Z : max.Z);
 
-			if (UVBlueprintLibrary::Intersect(childRegion, m_bounds))
+			if (UVoreealBlueprintLibrary::Intersect(childRegion, m_bounds))
 			{
 				int32 node = CreateNode(childRegion, parentId);
 				m_children[parentId]->m_childrenId[i] = node;
@@ -249,11 +249,11 @@ void FSparseOctree::BuildNode(int32 parentId)
 	}
 }
 
-void FSparseOctree::MarkChange(const int32& index, const FRegion& region, const FTimespan& changeTime)
+void FSparseOctree::MarkChange(const int32& index, const FVoreealRegion& region, const FTimespan& changeTime)
 {
 	FSparseOctreeNode* node = m_children[index];
 
-	if (UVBlueprintLibrary::Intersect(node->m_bounds, region))
+	if (UVoreealBlueprintLibrary::Intersect(node->m_bounds, region))
 	{
 		node->m_dataLastModified = changeTime;
 

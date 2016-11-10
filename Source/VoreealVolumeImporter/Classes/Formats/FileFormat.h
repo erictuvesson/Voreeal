@@ -1,6 +1,6 @@
 #pragma once
 
-#include "VBasicVolume.h"
+#include "VoreealBasicVolume.h"
 
 /// Abstract voxel file format
 class FVFileFormat

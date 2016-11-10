@@ -1,5 +1,5 @@
 #include "VoreealPrivatePCH.h"
-#include "VBasicVolumeActor.h"
+#include "VoreealBasicVolumeActor.h"
 
 #include "MessageLog.h"
 #include "UObjectToken.h"

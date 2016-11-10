@@ -1,7 +1,7 @@
 #include "VoreealPrivatePCH.h"
-#include "VBaseVolume.h"
+#include "VoreealVolume.h"
 
-void UBaseVolume::SetVoxel(const FVector& Location, const FColor& Color)
+void UVoreealVolume::SetVoxel(const FVector& Location, const FColor& Color)
 {
 	// TODO: Check if valid? Currently not doing because of performance.
 
@@ -14,7 +14,7 @@ void UBaseVolume::SetVoxel(const FVector& Location, const FColor& Color)
 	Internal_SetVoxel(Location, data);
 }
 
-void UBaseVolume::GetVoxel(const FVector& Location, FColor& Color)
+void UVoreealVolume::GetVoxel(const FVector& Location, FColor& Color)
 {
 	// TODO: Check if valid? Currently not doing because of performance.
 
@@ -27,29 +27,29 @@ void UBaseVolume::GetVoxel(const FVector& Location, FColor& Color)
 	Color.A = (data & 0xFF000000) >> 24;
 }
 
-bool UBaseVolume::IsValid() const
+bool UVoreealVolume::IsValid() const
 {
 	check(0 && "abstract");
 	return false;
 }
 
-bool UBaseVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
+bool UVoreealVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
 {
 	check(0 && "abstract");
 	return false;
 }
 
-void UBaseVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
+void UVoreealVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
 {
 	check(0 && "abstract");
 }
 
-void UBaseVolume::Internal_SetSize(const FRegion& Region, bool New)
+void UVoreealVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
 {
 	check(0 && "abstract");
 }
 
-void UBaseVolume::SerializeVolume(FArchive& Ar, FRegion& Region)
+void UVoreealVolume::SerializeVolume(FArchive& Ar, FVoreealRegion& Region)
 {
 	Ar << Region;
 
@@ -67,9 +67,9 @@ void UBaseVolume::SerializeVolume(FArchive& Ar, FRegion& Region)
 	}
 }
 
-void UBaseVolume::DeserializeVolume(FArchive& Ar)
+void UVoreealVolume::DeserializeVolume(FArchive& Ar)
 {
-	FRegion region;
+	FVoreealRegion region;
 	Ar << region;
 
 	Internal_SetSize(region, true);

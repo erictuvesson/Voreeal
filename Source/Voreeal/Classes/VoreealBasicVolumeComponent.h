@@ -1,12 +1,13 @@
 #pragma once
 
-#include "VOctree.h"
-#include "VBasicVolume.h"
-#include "VBasicVolumeComponent.generated.h"
+#include "VoreealOctree.h"
+#include "VoreealBasicVolume.h"
+#include "VoreealVolumeComponent.h"
+#include "VoreealBasicVolumeComponent.generated.h"
 
 /** Basic Voxel Volume Component, a fixed volume. */
 UCLASS(ClassGroup = (Rendering, Common), HideCategories = (Object, Activation, "Components|Activation"), ShowCategories = (Mobility), EditInlineNew, meta = (BlueprintSpawnableComponent))
-class UBasicVolumeComponent : public USceneComponent
+class UBasicVolumeComponent : public UVoreealVolumeComponent
 {
 	GENERATED_BODY()
 

@@ -11,9 +11,9 @@
 #include "VoreealModule.h"
 
 // Classes
-#include "VVector.h"
-#include "VRegion.h"
-#include "VBaseVolume.h"
+#include "VoreealVector.h"
+#include "VoreealRegion.h"
+#include "VoreealVolume.h"
 
 // PolyVox Classes
 #include <PolyVox/CubicSurfaceExtractor.h>

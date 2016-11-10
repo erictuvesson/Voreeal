@@ -2,15 +2,14 @@
 
 #include <PolyVox/RawVolume.h>
 
-#include "VBaseVolume.h"
-#include "VBasicVolume.generated.h"
+#include "VoreealVolume.h"
+#include "VoreealBasicVolume.generated.h"
 
 /**
- * Basic Voxel Volume;
- *	Enclosed volume with just basic LOD.
+ * Basic Voxel Volume; Enclosed volume with just basic LOD.
  */
 UCLASS(Blueprintable, meta = (DisplayThumbnail = "true"))
-class VOREEAL_API UBasicVolume : public UBaseVolume
+class VOREEAL_API UBasicVolume : public UVoreealVolume
 {
 	GENERATED_BODY()
 	
@@ -30,13 +29,13 @@ public:
 #endif
 	// End UObject Interface
 
-	// Begin UBaseVolume Interface
+	// Begin UVoreealVolume Interface
 	virtual bool IsValid() const override;
-	// End UBaseVolume Interface
+	// End UVoreealVolume Interface
 	
 	/// Gets the enclosing region.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
-	FRegion GetEnclosingRegion() const;
+	FVoreealRegion GetEnclosingRegion() const;
 
 	/// Resize the volume.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
@@ -44,7 +43,7 @@ public:
 
 	/// Resize the volume.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void ResizeRegion(const FRegion& NewRegion);
+	void ResizeRegion(const FVoreealRegion& NewRegion);
 
 public:
 #if WITH_EDITORONLY_DATA
@@ -56,7 +55,7 @@ public:
 protected:
 	virtual bool Internal_SetVoxel(const FVector& Location, const uint32& Data) override;
 	virtual void Internal_GetVoxel(const FVector& Location, uint32& Data) override;
-	virtual void Internal_SetSize(const FRegion& Region, bool New);
+	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 
 private:
 	std::unique_ptr<VolumeType> Volume;
@@ -64,5 +63,6 @@ private:
 	UPROPERTY()
 	TArray<uint8> ImportedData;
 
-	friend class UVVolumeImporterFactory;
+	// UVoreealVolumeImporterFactory has to access ImportedData
+	friend class UVoreealVolumeImporterFactory;
 };

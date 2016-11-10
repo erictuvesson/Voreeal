@@ -1,5 +1,5 @@
 #include "VoreealPrivatePCH.h"
-#include "VBasicVolume.h"
+#include "VoreealBasicVolume.h"
 
 #include <PolyVox/VolumeResampler.h>
 
@@ -84,7 +84,7 @@ void UBasicVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
 	Data = Volume->getVoxel(pos);
 }
 
-void UBasicVolume::Internal_SetSize(const FRegion& Region, bool New)
+void UBasicVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
 {
 	if (New)
 	{
@@ -93,17 +93,17 @@ void UBasicVolume::Internal_SetSize(const FRegion& Region, bool New)
 	ResizeRegion(Region);
 }
 
-FRegion UBasicVolume::GetEnclosingRegion() const
+FVoreealRegion UBasicVolume::GetEnclosingRegion() const
 {
-	return FRegion(Volume->getEnclosingRegion());
+	return FVoreealRegion(Volume->getEnclosingRegion());
 }
 
 void UBasicVolume::Resize(const FIntVector& NewSize)
 {
-	ResizeRegion(FRegion(0, 0, 0, NewSize.X, NewSize.Y, NewSize.Z));
+	ResizeRegion(FVoreealRegion(0, 0, 0, NewSize.X, NewSize.Y, NewSize.Z));
 }
 
-void UBasicVolume::ResizeRegion(const FRegion& NewRegion)
+void UBasicVolume::ResizeRegion(const FVoreealRegion& NewRegion)
 {
 	if (IsValid())
 	{

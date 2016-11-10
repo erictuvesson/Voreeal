@@ -1,7 +1,7 @@
 #include "VoreealEditorPrivatePCH.h"
-#include "VImporterSettings.h"
+#include "VoreealImporterSettings.h"
 
-UVImporterSettings::UVImporterSettings()
+UVoreealImporterSettings::UVoreealImporterSettings()
 {
 	if (!IsRunningCommandlet())
 	{

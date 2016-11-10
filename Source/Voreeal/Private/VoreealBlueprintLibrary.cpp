@@ -1,24 +1,24 @@
 #include "VoreealPrivatePCH.h"
-#include "VBlueprintLibrary.h"
+#include "VoreealBlueprintLibrary.h"
 
 #include "DrawDebugHelpers.h"
 
-void UVBlueprintLibrary::GetCenter(const FRegion& Region, FVector& Result)
+void UVoreealBlueprintLibrary::GetCenter(const FVoreealRegion& Region, FVector& Result)
 {
 	Result = FVector(Region.X + (Region.Width / 2), Region.Y + (Region.Height / 2), Region.Z + (Region.Depth / 2));
 }
 
-void UVBlueprintLibrary::GetUpperCorner(const FRegion& Region, FVector& Result)
+void UVoreealBlueprintLibrary::GetUpperCorner(const FVoreealRegion& Region, FVector& Result)
 {
 	Result = FVector(Region.X, Region.Y, Region.Z);
 }
 
-void UVBlueprintLibrary::GetLowerCorner(const FRegion& Region, FVector& Result)
+void UVoreealBlueprintLibrary::GetLowerCorner(const FVoreealRegion& Region, FVector& Result)
 {
 	Result = FVector(Region.X + Region.Width, Region.Y + Region.Height, Region.Z + Region.Depth);
 }
 
-void UVBlueprintLibrary::Grow(const FRegion& Region, int32 Width, int32 Height, int32 Depth, FRegion& Result)
+void UVoreealBlueprintLibrary::Grow(const FVoreealRegion& Region, int32 Width, int32 Height, int32 Depth, FVoreealRegion& Result)
 {
 	Result = Region;
 	Result.X -= Width;
@@ -29,7 +29,7 @@ void UVBlueprintLibrary::Grow(const FRegion& Region, int32 Width, int32 Height, 
 	Result.Depth += Depth * 2;
 }
 
-void UVBlueprintLibrary::ShiftUpperCorner(const FRegion& Region, int32 X, int32 Y, int32 Z, FRegion& Result)
+void UVoreealBlueprintLibrary::ShiftUpperCorner(const FVoreealRegion& Region, int32 X, int32 Y, int32 Z, FVoreealRegion& Result)
 {
 	Result = Region;
 	Result.X += X;
@@ -40,7 +40,7 @@ void UVBlueprintLibrary::ShiftUpperCorner(const FRegion& Region, int32 X, int32 
 	Result.Depth -= Z;
 }
 
-void UVBlueprintLibrary::ShiftLowerCorner(const FRegion& Region, int32 X, int32 Y, int32 Z, FRegion& Result)
+void UVoreealBlueprintLibrary::ShiftLowerCorner(const FVoreealRegion& Region, int32 X, int32 Y, int32 Z, FVoreealRegion& Result)
 {
 	Result = Region;
 	Result.Width += X;
@@ -48,7 +48,7 @@ void UVBlueprintLibrary::ShiftLowerCorner(const FRegion& Region, int32 X, int32 
 	Result.Depth += Z;
 }
 
-bool UVBlueprintLibrary::Contains(const FRegion& Region1, const FRegion& Region2)
+bool UVoreealBlueprintLibrary::Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
 {
 	return (Region2.X < (Region1.X + Region1.Width))
 		&& (Region1.X < (Region2.X + Region2.Width))
@@ -58,7 +58,7 @@ bool UVBlueprintLibrary::Contains(const FRegion& Region1, const FRegion& Region2
 		&& (Region1.Z < (Region2.Z + Region2.Depth));
 }
 
-bool UVBlueprintLibrary::Intersect(const FRegion& Region1, const FRegion& Region2)
+bool UVoreealBlueprintLibrary::Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
 {
 	return (Region2.X < (Region1.X + Region1.Width))
 		&& (Region1.X < (Region2.X + Region2.Width))
@@ -68,8 +68,8 @@ bool UVBlueprintLibrary::Intersect(const FRegion& Region1, const FRegion& Region
 		&& (Region1.Z < (Region2.Z + Region2.Depth));
 }
 
-void UVBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform, 
-	const FRegion& Region, const FColor& Color, float Duration, float Thickness)
+void UVoreealBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform, 
+	const FVoreealRegion& Region, const FColor& Color, float Duration, float Thickness)
 {
 	UWorld* World = WorldContextObject->GetWorld();
 	if (World)
