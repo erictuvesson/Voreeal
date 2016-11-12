@@ -3,14 +3,9 @@ using System.IO;
 
 public class Voreeal : ModuleRules
 {
-    private string ModulePath
-    {
-        get { return ModuleDirectory; }
-    }
-
     private string PolyVoxPath
     {
-        get { return Path.GetFullPath(Path.Combine(ModulePath, "../PolyVox/")); }
+        get { return Path.GetFullPath(Path.Combine(ModuleDirectory, "ThirdParty/PolyVox/")); }
     }
 
     public Voreeal(TargetInfo Target)
