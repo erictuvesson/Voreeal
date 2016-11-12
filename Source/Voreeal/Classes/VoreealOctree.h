@@ -32,11 +32,6 @@ enum class ETraverseOptions
 	Stop,
 };
 
-struct FSparseOctreeTask
-{
-	TFuture<int> Task;
-};
-
 /** Sparse Octree Node */
 struct FSparseOctreeNode
 {
@@ -63,9 +58,6 @@ struct FSparseOctreeNode
 
 	/// The current depth of this node. (this is in reverse)
 	int32 m_depth;
-
-	/// Extraction Task.
-	TSharedPtr<FSparseOctreeTask> m_lastSurfaceExtractionTask;
 
 	FTimespan m_dataLastModified;
 	FTimespan m_lastSceduledForUpdate;
@@ -164,7 +156,6 @@ private:
 private:
 	UVoreealVolumeComponent* m_volumeComponent;
 	UVoreealVolume* m_volume;
-	TArray<TSharedPtr<FSparseOctreeTask>> m_tasks;
 
 	// Octree
 	TArray<FSparseOctreeNode*> m_children;

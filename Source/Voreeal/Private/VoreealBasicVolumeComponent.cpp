@@ -109,21 +109,3 @@ void UBasicVolumeComponent::Update()
 		//m_octree->Update(FVector(0, 0, 0));
 	}
 }
-
-void UBasicVolumeComponent::TaskStart()
-{
-	AddTask(Volume, FVoreealExtractorOptions(FVoreealRegion(0, 0, 0, 32, 32, 32)));
-}
-
-bool UBasicVolumeComponent::TaskGet()
-{
-	TSharedPtr<FVoreealMesh> Result;
-	if (FindFinishedTask(Result))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Result->Options.Region.ToString());
-		Result.Reset();
-		//delete Result;
-		return true;
-	}
-	return false;
-}
