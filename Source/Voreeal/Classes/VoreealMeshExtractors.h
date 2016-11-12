@@ -19,6 +19,7 @@ struct FVoreealExtractorOptions
 	}
 };
 
+/// Extracted Mesh
 class FVoreealMesh
 {
 public:

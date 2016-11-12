@@ -10,10 +10,17 @@ class VOREEAL_API UVoreealVolumeComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleInstanceOnly, Category = "Voreeal")
+	class UProceduralMeshComponent* MeshComponent;
+
+public:
 	UVoreealVolumeComponent(const class FObjectInitializer& ObjectInitializer);
 
 protected:
+	// Get if there are any finished tasks.
 	bool FindFinishedTask(TSharedPtr<FVoreealMesh>& Result);
+
+	// Queue a new task.
 	void AddTask(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options);
 
 private:

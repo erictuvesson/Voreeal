@@ -5,7 +5,7 @@
 #include <Future.h>
 #include <PolyVox/RawVolume.h>
 
-class UProceduralMeshComponent;
+class UVoreealVolumeComponent;
 class UVoreealVolume;
 class UBasicVolume;
 
@@ -104,12 +104,12 @@ class FSparseOctree
 {
 public:
 	/// Constructor
-	FSparseOctree(UBasicVolume* volume, UProceduralMeshComponent* meshComponent, 
-		const EOctreeConstructionModes& constMode);
+	FSparseOctree(UBasicVolume* Volume, UVoreealVolumeComponent* VolumeComponent,
+		const EOctreeConstructionModes& ConstMode);
 
 	/// Constructor
-	FSparseOctree(UVoreealVolume* volume, UProceduralMeshComponent* meshComponent, 
-		const FVoreealRegion& region, const EOctreeConstructionModes& constMode);
+	FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* VolumeComponent,
+		const FVoreealRegion& Region, const EOctreeConstructionModes& ConstMode);
 
 	/// Destructor
 	virtual ~FSparseOctree();
@@ -162,7 +162,7 @@ private:
 	void MarkChange(const int32& index, const FVoreealRegion& region, const FTimespan& changeTime);
 
 private:
-	UProceduralMeshComponent* m_meshComponent;
+	UVoreealVolumeComponent* m_volumeComponent;
 	UVoreealVolume* m_volume;
 	TArray<TSharedPtr<FSparseOctreeTask>> m_tasks;
 

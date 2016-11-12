@@ -12,10 +12,6 @@ class UBasicVolumeComponent : public UVoreealVolumeComponent
 	GENERATED_BODY()
 
 public:
-	/// Procedural Voxel Mesh
-	UPROPERTY(VisibleAnywhere, Category = "Voreeal")
-	class UProceduralMeshComponent* MeshComponent;
-
 	/// Voxel Volume Asset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
 	UBasicVolume* Volume;

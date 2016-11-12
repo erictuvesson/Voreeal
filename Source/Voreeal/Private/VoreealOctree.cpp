@@ -3,6 +3,7 @@
 
 #include "VoreealVolume.h"
 #include "VoreealBasicVolume.h"
+#include "VoreealVolumeComponent.h"
 #include "VoreealBlueprintLibrary.h"
 
 FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root)
@@ -19,37 +20,37 @@ FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSpa
 	}
 }
 
-FSparseOctree::FSparseOctree(UBasicVolume* volume, UProceduralMeshComponent* meshComponent, 
-	const EOctreeConstructionModes& constMode)
-	: FSparseOctree(volume, meshComponent, volume->GetEnclosingRegion(), constMode)
+FSparseOctree::FSparseOctree(UBasicVolume* Volume, UVoreealVolumeComponent* VolumeComponent,
+	const EOctreeConstructionModes& ConstMode)
+	: FSparseOctree(Volume, VolumeComponent, Volume->GetEnclosingRegion(), ConstMode)
 {
 
 }
 
-FSparseOctree::FSparseOctree(UVoreealVolume* volume, UProceduralMeshComponent* meshComponent, 
-	const FVoreealRegion& region, const EOctreeConstructionModes& constMode)
+FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* VolumeComponent,
+	const FVoreealRegion& Region, const EOctreeConstructionModes& ConstMode)
 	: m_rootId(FSparseOctreeNode::InvalidNodeIndex)
-	, m_bounds(region)
+	, m_bounds(Region)
 	, m_volume(m_volume)
-	, m_meshComponent(m_meshComponent)
-	, m_constMode(constMode)
+	, m_volumeComponent(VolumeComponent)
+	, m_constMode(ConstMode)
 {
-	if (constMode == EOctreeConstructionModes::BoundVoxels)
+	if (ConstMode == EOctreeConstructionModes::BoundVoxels)
 	{
 		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
 	}
-	else if (constMode == EOctreeConstructionModes::BoundCells)
+	else if (ConstMode == EOctreeConstructionModes::BoundCells)
 	{
 		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, -1, -1, -1, m_bounds);
 		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
 	}
 
-	int32 width = (constMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Width  : m_bounds.Width + 1;
-	int32 height = (constMode == EOctreeConstructionModes::BoundCells) ? m_bounds.Height : m_bounds.Height + 1;
-	int32 depth = (constMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Depth  : m_bounds.Depth + 1;
+	int32 width = (ConstMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Width  : m_bounds.Width + 1;
+	int32 height = (ConstMode == EOctreeConstructionModes::BoundCells) ? m_bounds.Height : m_bounds.Height + 1;
+	int32 depth = (ConstMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Depth  : m_bounds.Depth + 1;
 
-	int32 largestDimension = (std::max)(region.Width, (std::max)(region.Height, region.Depth));
-	if (constMode == EOctreeConstructionModes::BoundCells)
+	int32 largestDimension = (std::max)(Region.Width, (std::max)(Region.Height, Region.Depth));
+	if (ConstMode == EOctreeConstructionModes::BoundCells)
 	{
 		largestDimension--;
 	}
