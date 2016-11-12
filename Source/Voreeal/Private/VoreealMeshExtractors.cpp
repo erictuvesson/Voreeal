@@ -1,19 +1,22 @@
 #include "VoreealPrivatePCH.h"
 #include "VoreealMeshExtractors.h"
 
-void UVoreealCubicSurfaceExtractor::ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options, FProcMeshSection& OutSection)
+FVoreealMesh UVoreealCubicSurfaceExtractor::ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options)
 {
 	/*VolumeType* processVolume = Volume;
 
 	auto mesh = extractCubicMesh(processVolume, region);
 	ConvertMesh(mesh, Mesh);*/
 
+	return FVoreealMesh(Options);
 }
 
-void UVoreealMarchingCubesSurfaceExtractor::ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options, FProcMeshSection& OutSection)
+FVoreealMesh UVoreealMarchingCubesSurfaceExtractor::ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options)
 {
 	/*VolumeType* processVolume = Volume;
 
 	auto mesh = extractMarchingCubesMesh(processVolume, region);
 	ConvertMesh(mesh, Mesh);*/
+
+	return FVoreealMesh(Options);
 }

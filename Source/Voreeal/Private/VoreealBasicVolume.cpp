@@ -10,31 +10,41 @@
 UBasicVolume::UBasicVolume(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-
+	Resize(FIntVector(64, 64, 64));
 }
 
 void UBasicVolume::Serialize(FArchive& Ar)
 {
 	Super::Serialize(Ar);
 
+	// If data is empty serialize the volume
+	// This can happen because the volume was created at runtime
+	if (!Ar.IsLoading() && ImportedData.Num() == 0)
+	{
+		FVoreealRegion Region = GetEnclosingRegion();
+		FBufferArchive Arr;
+		SerializeVolume(Arr, Region);
+		ImportedData = Arr;
+	}
+
 	Ar << ImportedData;
 
-#if WITH_EDITORONLY_DATA
-	if (Ar.IsLoading() && (AssetImportData == nullptr))
-	{
-		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
-	}
-#endif
+//#if WITH_EDITORONLY_DATA
+//	if (Ar.IsLoading() && (AssetImportData == nullptr))
+//	{
+//		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+//	}
+//#endif
 }
 
 void UBasicVolume::PostInitProperties()
 {
-#if WITH_EDITORONLY_DATA
-	if (!HasAnyFlags(RF_ClassDefaultObject))
-	{
-		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
-	}
-#endif
+//#if WITH_EDITORONLY_DATA
+//	if (!HasAnyFlags(RF_ClassDefaultObject))
+//	{
+//		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+//	}
+//#endif
 	Super::PostInitProperties();
 }
 
@@ -58,10 +68,10 @@ void UBasicVolume::PostLoad()
 #if WITH_EDITORONLY_DATA
 void UBasicVolume::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const
 {
-	if (AssetImportData)
-	{
-		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
-	}
+	//if (AssetImportData)
+	//{
+	//	OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+	//}
 	Super::GetAssetRegistryTags(OutTags);
 }
 #endif

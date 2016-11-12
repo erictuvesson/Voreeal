@@ -3,6 +3,7 @@
 #include <ProceduralMeshComponent.h>
 
 #include "VoreealRegion.h"
+#include "VoreealMeshExtractors.h"
 #include "VoreealVolume.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FVoreealRegion, Region);
@@ -15,8 +16,11 @@ class VOREEAL_API UVoreealVolume : public UObject
 
 public:
 	/// Occures when the volume has changed.
-	UPROPERTY(BlueprintAssignable, Category = Voreeal)
+	UPROPERTY(BlueprintAssignable, Category = "Voreeal")
 	FVolumeChanged OnChanged;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Voreeal")
+	TSubclassOf<UVoreealMeshExtractor> MeshExtractor;
 
 public:
 	///// Extract mesh.
@@ -24,7 +28,7 @@ public:
 	//virtual void ExtractMesh(const FVoreealRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
 
 	/// Set Voxel at Location.
-	UFUNCTION(BlueprintCallable, Category = Voreeal)
+	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color) {
 		SetVoxel(FVector(X, Y, Z), Color);
 	}
@@ -35,15 +39,15 @@ public:
 	}
 
 	/// Set Voxel at Location.
-	UFUNCTION(BlueprintCallable, Category = Voreeal)
+	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void SetVoxel(const FVector& Location, const FColor& Color);
 	
 	/// Get Voxel at Location.
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	void GetVoxel(const FVector& Location, FColor& Color);
 
 	/// Checks if the volume is valid.
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	virtual bool IsValid() const;
 
 public:

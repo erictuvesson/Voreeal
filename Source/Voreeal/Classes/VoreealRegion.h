@@ -67,6 +67,11 @@ struct VOREEAL_API FVoreealRegion
 	/// Gets the size.
 	FVector Size() const { return FVector(Width, Height, Depth); }
 
+	FORCEINLINE FString ToString() const
+	{
+		return FString::Printf(TEXT("Min=[%s] Max=[%s]"), *Min().ToString(), *Max().ToString());
+	}
+
 	FORCEINLINE FVoreealRegion& operator=(const PolyVox::Region& Other)
 	{
 		int32 width = Other.getWidthInVoxels();

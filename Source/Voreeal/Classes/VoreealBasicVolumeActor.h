@@ -10,7 +10,7 @@ class VOREEAL_API ABasicVolumeActor : public AVoreealActor
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Voreeal, meta = (ExposeFunctionCategories = "Mesh,Rendering,Physics,Components|StaticMesh", AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (ExposeFunctionCategories = "Voreeal,Rendering,Physics", AllowPrivateAccess = "true"))
 	UBasicVolumeComponent* BasicVolumeComponent;
 
 public:

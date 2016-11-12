@@ -9,7 +9,7 @@ ABasicVolumeActor::ABasicVolumeActor(const class FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 	BasicVolumeComponent = CreateDefaultSubobject<UBasicVolumeComponent>(TEXT("BasicVolumeComponent"));
-	BasicVolumeComponent->Mobility = EComponentMobility::Static;
+	//BasicVolumeComponent->Mobility = EComponentMobility::Static;
 
 	RootComponent = BasicVolumeComponent;
 }

@@ -5,19 +5,31 @@
 
 class UVoreealVolume;
 
-struct FVoreealMesh
-{
-
-};
-
 /// Extractor Options
-USTRUCT()
 struct FVoreealExtractorOptions
 {
-	GENERATED_BODY()
-
 	FVoreealRegion Region;
 	int32 LOD;
+
+	FVoreealExtractorOptions(FVoreealRegion Region)
+		: Region(Region)
+		, LOD(0)
+	{
+
+	}
+};
+
+class FVoreealMesh
+{
+public:
+	FVoreealExtractorOptions Options;
+
+public:
+	FVoreealMesh(FVoreealExtractorOptions Options)
+		: Options(Options)
+	{
+
+	}
 };
 
 /// Base Class for mesh extractors.
@@ -29,7 +41,10 @@ class UVoreealMeshExtractor : public UObject
 
 public:
 	/// Extract the mesh.
-	virtual void ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options, FProcMeshSection& OutSection) { }
+	virtual FVoreealMesh ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options) 
+	{ 
+		return FVoreealMesh(Options);
+	}
 };
 
 /// Cubic Surface Extractor, extracts the voxels as cubes like Minecraft.
@@ -38,8 +53,8 @@ class UVoreealCubicSurfaceExtractor : public UVoreealMeshExtractor
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options, FProcMeshSection& OutSection)  override;
+public:
+	virtual FVoreealMesh ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options) override;
 };
 
 /// Marching Cubes Surface Extractor, extracts the voxels as smooth terrain.
@@ -48,6 +63,6 @@ class UVoreealMarchingCubesSurfaceExtractor : public UVoreealMeshExtractor
 {
 	GENERATED_BODY()
 
-protected:
-	virtual void ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options, FProcMeshSection& OutSection) override;
+public:
+	virtual FVoreealMesh ExtractMesh(UVoreealVolume* Volume, const FVoreealExtractorOptions& Options) override;
 };

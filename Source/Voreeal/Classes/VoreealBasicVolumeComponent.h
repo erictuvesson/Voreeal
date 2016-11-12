@@ -30,10 +30,15 @@ public:
 	// End UObject Interface
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Voreeal")
-	virtual bool SetBasicVolume(class UBasicVolume* NewVolume);
+	virtual bool SetBasicVolume(UBasicVolume* NewVolume);
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
 	void DrawDebugOctree(const FColor& Color, float Duration, float Thickness);
+
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|Debug")
+	void TaskStart();
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|Debug")
+	bool TaskGet();
 
 private:
 	void EnsureRendering();

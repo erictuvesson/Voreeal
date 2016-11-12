@@ -9,6 +9,9 @@ UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& Obj
 	, m_octree(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = false;
+
+	Volume = ObjectInitializer.CreateDefaultSubobject<UBasicVolume>(this, TEXT("NewVolume"));
+	check(Volume);
 }
 
 UBasicVolumeComponent::~UBasicVolumeComponent()
@@ -40,12 +43,10 @@ FString UBasicVolumeComponent::GetDetailedInfoInternal() const
 	return (Volume != NULL) ? Volume->GetPathName(NULL) : TEXT("No_Volume");
 }
 
-bool UBasicVolumeComponent::SetBasicVolume(class UBasicVolume* NewVolume)
+bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 {
 	if (NewVolume == Volume)
-	{
 		return false;
-	}
 
 	AActor* Owner = GetOwner();
 	if (!AreDynamicDataChangesAllowed() && Owner != NULL)
@@ -57,6 +58,13 @@ bool UBasicVolumeComponent::SetBasicVolume(class UBasicVolume* NewVolume)
 	}
 
 	Volume = NewVolume;
+
+	// If there were a volume before we call then we force gc
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->ForceGarbageCollection(true);
+	}
 
 	EnsureRendering();
 	// TODO: Mark dirty
@@ -88,10 +96,9 @@ void UBasicVolumeComponent::EnsureRendering()
 	{
 		m_octree = new FSparseOctree(Volume, MeshComponent, EOctreeConstructionModes::BoundCells);
 
-
-		UWorld* World = GetWorld();
-		FTimerManager& TimerManager = World->GetTimerManager();
-		TimerManager.SetTimer(timerHandle, this, &UBasicVolumeComponent::Update, 1.0f, true);
+		//UWorld* World = GetWorld();
+		//FTimerManager& TimerManager = World->GetTimerManager();
+		//TimerManager.SetTimer(timerHandle, this, &UBasicVolumeComponent::Update, 1.0f, true);
 	}
 }
 
@@ -99,6 +106,24 @@ void UBasicVolumeComponent::Update()
 {
 	if (m_octree)
 	{
-		m_octree->Update(FVector(0, 0, 0));
+		//m_octree->Update(FVector(0, 0, 0));
 	}
+}
+
+void UBasicVolumeComponent::TaskStart()
+{
+	AddTask(Volume, FVoreealExtractorOptions(FVoreealRegion(0, 0, 0, 32, 32, 32)));
+}
+
+bool UBasicVolumeComponent::TaskGet()
+{
+	TSharedPtr<FVoreealMesh> Result;
+	if (FindFinishedTask(Result))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Result->Options.Region.ToString());
+		Result.Reset();
+		//delete Result;
+		return true;
+	}
+	return false;
 }

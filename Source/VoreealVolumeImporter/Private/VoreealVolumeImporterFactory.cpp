@@ -120,15 +120,15 @@ UObject* UVoreealVolumeImporterFactory::FactoryCreateText(UClass* InClass, UObje
 		return nullptr;
 	}
 
+	FVoreealRegion Region = Result->GetEnclosingRegion();
 	FBufferArchive Ar;
-	// TODO: !!!
-	//Voreeal::Export(polyVoxVolume, Ar);
+	Result->SerializeVolume(Ar, Region);
 	Result->ImportedData = Ar;
 
 	Result->PostEditChange();
 
 	// Store the current file path and timestamp for re-import purposes
-	Result->AssetImportData->Update(CurrentFilename);
+	//Result->AssetImportData->Update(CurrentFilename);
 	
 	FEditorDelegates::OnAssetPostImport.Broadcast(this, Result);
 
@@ -139,11 +139,11 @@ bool UVoreealVolumeImporterFactory::CanReimport(UObject* Obj, TArray<FString>& O
 {
 	if (UBasicVolume* volume = Cast<UBasicVolume>(Obj))
 	{
-		if (volume->AssetImportData != nullptr)
-		{
-			volume->AssetImportData->ExtractFilenames(OutFilenames);
-		}
-		else
+		//if (volume->AssetImportData != nullptr)
+		//{
+		//	volume->AssetImportData->ExtractFilenames(OutFilenames);
+		//}
+		//else
 		{
 			OutFilenames.Add(FString());
 		}
@@ -158,65 +158,65 @@ void UVoreealVolumeImporterFactory::SetReimportPaths(UObject* Obj, const TArray<
 	{
 		if (ensure(NewReimportPaths.Num() == 1))
 		{
-			volume->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
+			//volume->AssetImportData->UpdateFilenameOnly(NewReimportPaths[0]);
 		}
 	}
 }
 
 EReimportResult::Type UVoreealVolumeImporterFactory::Reimport(UObject* Obj)
 {
-	if (UBasicVolume* Volume = Cast<UBasicVolume>(Obj))
-	{
-		FString Filename = Volume->AssetImportData->GetFirstFilename();
-		FString FilenameExtension = FPaths::GetExtension(Filename);
+	//if (UBasicVolume* Volume = Cast<UBasicVolume>(Obj))
+	//{
+	//	FString Filename = Volume->AssetImportData->GetFirstFilename();
+	//	FString FilenameExtension = FPaths::GetExtension(Filename);
 
-		TArray<uint8> TheBinaryArray;
-		if (!FFileHelper::LoadFileToArray(TheBinaryArray, *CurrentFilename))
-		{
-			UE_LOG(LogVoreealVolumeImporter, Error, TEXT("Invalid File"));
-			return EReimportResult::Failed;
-		}
+	//	TArray<uint8> TheBinaryArray;
+	//	if (!FFileHelper::LoadFileToArray(TheBinaryArray, *CurrentFilename))
+	//	{
+	//		UE_LOG(LogVoreealVolumeImporter, Error, TEXT("Invalid File"));
+	//		return EReimportResult::Failed;
+	//	}
 
-		FString ErrorMessage;
-		bool Success = false;
+	//	FString ErrorMessage;
+	//	bool Success = false;
 
-		for (auto fileFormat : FileFormats)
-		{
-			if (fileFormat->GetExtension() == FilenameExtension)
-			{
-				FMemoryReader IsAr = FMemoryReader(TheBinaryArray, true);
-				if (fileFormat->IsFile(IsAr, ErrorMessage))
-				{
-					// TODO: Reset memory reader position instead
-					FMemoryReader Ar = FMemoryReader(TheBinaryArray, true);
-					if (fileFormat->ReadFile(Ar, Volume, ErrorMessage))
-					{
-						Success = true;
-					}
-					else
-					{
-						FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(ErrorMessage));
-						return EReimportResult::Failed;
-					}
-				}
-			}
-		}
+	//	for (auto fileFormat : FileFormats)
+	//	{
+	//		if (fileFormat->GetExtension() == FilenameExtension)
+	//		{
+	//			FMemoryReader IsAr = FMemoryReader(TheBinaryArray, true);
+	//			if (fileFormat->IsFile(IsAr, ErrorMessage))
+	//			{
+	//				// TODO: Reset memory reader position instead
+	//				FMemoryReader Ar = FMemoryReader(TheBinaryArray, true);
+	//				if (fileFormat->ReadFile(Ar, Volume, ErrorMessage))
+	//				{
+	//					Success = true;
+	//				}
+	//				else
+	//				{
+	//					FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(ErrorMessage));
+	//					return EReimportResult::Failed;
+	//				}
+	//			}
+	//		}
+	//	}
 
-		if (!Success)
-		{
-			FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Found no suitable importer!")));
-			return EReimportResult::Failed;
-		}
+	//	if (!Success)
+	//	{
+	//		FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Found no suitable importer!")));
+	//		return EReimportResult::Failed;
+	//	}
 
-		FMemoryWriter MemoryWriter{ Volume->ImportedData, true };
-		FArchive Ar{ MemoryWriter };
-		// TODO: !!!
-		//Voreeal::Export(polyVoxVolume, Ar);
+	//	FMemoryWriter MemoryWriter{ Volume->ImportedData, true };
+	//	FArchive Ar{ MemoryWriter };
+	//	// TODO: !!!
+	//	//Voreeal::Export(polyVoxVolume, Ar);
 
-		Volume->PostEditChange();
+	//	Volume->PostEditChange();
 
-		return EReimportResult::Succeeded;
-	}
+	//	return EReimportResult::Succeeded;
+	//}
 	return EReimportResult::Failed;
 }
 

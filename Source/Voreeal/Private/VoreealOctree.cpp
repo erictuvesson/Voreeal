@@ -5,11 +5,6 @@
 #include "VoreealBasicVolume.h"
 #include "VoreealBlueprintLibrary.h"
 
-/// 
-/// Parts of this code is based on Cubiquity's Octree
-/// https://bitbucket.org/volumesoffun/cubiquity
-/// 
-
 FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root)
 	: m_selfId(InvalidNodeIndex)
 	, m_parentId(parentId)

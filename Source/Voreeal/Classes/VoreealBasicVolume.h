@@ -47,8 +47,8 @@ public:
 
 public:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(Category = ImportSettings, VisibleAnywhere, Instanced)
-	class UAssetImportData* AssetImportData;
+	//UPROPERTY(Category = ImportSettings, VisibleAnywhere, Instanced)
+	//class UAssetImportData* AssetImportData;
 	class USceneThumbnailInfo* ThumbnailInfo;
 #endif
 
