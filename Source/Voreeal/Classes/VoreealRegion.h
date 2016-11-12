@@ -84,14 +84,8 @@ struct VOREEAL_API FVoreealRegion
 	// Grow the region.
 	void Grow(int32 Width, int32 Height, int32 Depth);
 
-	// Grow the region.
-	void Grow(int32 Width, int32 Height, int32 Depth, FVoreealRegion& Result);
-
 	// Grow the region from every direction.
 	void GrowUnified(int32 Amount);
-
-	// Grow the region from every direction.
-	void GrowUnified(int32 Amount, FVoreealRegion& Result);
 
 	// Shift the upper corner of the region.
 	void ShiftUpperCorner(int32 X, int32 Y, int32 Z);
@@ -165,63 +159,41 @@ FORCEINLINE FVector FVoreealRegion::GetCenter() const
 	return FVector(X + (Width / 2), Y + (Height / 2), Z + (Depth / 2));
 }
 
-FORCEINLINE void Grow(int32 Width, int32 Height, int32 Depth, FVoreealRegion& Result)
+FORCEINLINE void FVoreealRegion::Grow(int32 pWidth, int32 pHeight, int32 pDepth)
 {
-	Result = FVoreealRegion();
-	Result.X -= Width;
-	Result.Y -= Height;
-	Result.Z -= Depth;
-	Result.Width += Width * 2;
-	Result.Height += Height * 2;
-	Result.Depth += Depth * 2;
-}
-
-FORCEINLINE void FVoreealRegion::Grow(int32 Width, int32 Height, int32 Depth)
-{
-	X -= Width;
-	Y -= Height;
-	Z -= Depth;
-	Width += Width * 2;
-	Height += Height * 2;
-	Depth += Depth * 2;
+	this->X -= pWidth;
+	this->Y -= pHeight;
+	this->Z -= pDepth;
+	this->Width += pWidth * 2;
+	this->Height += pHeight * 2;
+	this->Depth += pDepth * 2;
 }
 
 FORCEINLINE void FVoreealRegion::GrowUnified(int32 Amount)
 {
-	X -= Amount;
-	Y -= Amount;
-	Z -= Amount;
-	Width += Amount * 2;
-	Height += Amount * 2;
-	Depth += Amount * 2;
+	this->X -= Amount;
+	this->Y -= Amount;
+	this->Z -= Amount;
+	this->Width += Amount * 2;
+	this->Height += Amount * 2;
+	this->Depth += Amount * 2;
 }
 
-FORCEINLINE void FVoreealRegion::GrowUnified(int32 Amount, FVoreealRegion& Result)
+FORCEINLINE void FVoreealRegion::ShiftUpperCorner(int32 pX, int32 pY, int32 pZ)
 {
-	Result = FVoreealRegion();
-	Result.X -= Amount;
-	Result.Y -= Amount;
-	Result.Z -= Amount;
-	Result.Width += Amount * 2;
-	Result.Height += Amount * 2;
-	Result.Depth += Amount * 2;
+	X += pX;
+	Y += pY;
+	Z += pZ;
+	Width -= pX;
+	Height -= pY;
+	Depth -= pZ;
 }
 
-FORCEINLINE void FVoreealRegion::ShiftUpperCorner(int32 X, int32 Y, int32 Z)
+FORCEINLINE void FVoreealRegion::ShiftLowerCorner(int32 pX, int32 pY, int32 pZ)
 {
-	X += X;
-	Y += Y;
-	Z += Z;
-	Width -= X;
-	Height -= Y;
-	Depth -= Z;
-}
-
-FORCEINLINE void FVoreealRegion::ShiftUpperCorner(int32 X, int32 Y, int32 Z)
-{
-	Width += X;
-	Height += Y;
-	Depth += Z;
+	Width += pX;
+	Height += pY;
+	Depth += pZ;
 }
 
 FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2)

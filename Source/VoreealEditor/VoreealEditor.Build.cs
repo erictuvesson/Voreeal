@@ -4,10 +4,16 @@ public class VoreealEditor : ModuleRules
 {
 	public VoreealEditor(TargetInfo Target)
 	{
-		//PrivateIncludePaths.Add("PolyVoxEditor/Private");
+		PrivateIncludePaths.AddRange(
+			new string[]
+			{
+				"VoreealEditor/Private",
+				"VoreealEditor/Private/Tests",
+			});
 
 		PrivateDependencyModuleNames.AddRange(
-			new string[] {
+			new string[] 
+			{
 				"Core",
 				"CoreUObject",
 				"Json",
@@ -31,14 +37,16 @@ public class VoreealEditor : ModuleRules
 			});
 
 		PrivateIncludePathModuleNames.AddRange(
-			new string[] {
+			new string[] 
+			{
 				"Settings",
 				"IntroTutorials",
 				"AssetTools"
 			});
 
 		DynamicallyLoadedModuleNames.AddRange(
-			new string[] {
+			new string[] 
+			{
 				"AssetTools"
 			});
 	}

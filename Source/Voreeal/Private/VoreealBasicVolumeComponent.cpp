@@ -94,7 +94,7 @@ void UBasicVolumeComponent::EnsureRendering()
 {
 	if (Volume != nullptr && m_octree == nullptr)
 	{
-		m_octree = new FSparseOctree(Volume, MeshComponent, EOctreeConstructionModes::BoundCells);
+		m_octree = new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells);
 
 		//UWorld* World = GetWorld();
 		//FTimerManager& TimerManager = World->GetTimerManager();

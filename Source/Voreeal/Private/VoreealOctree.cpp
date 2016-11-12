@@ -4,7 +4,6 @@
 #include "VoreealVolume.h"
 #include "VoreealBasicVolume.h"
 #include "VoreealVolumeComponent.h"
-#include "VoreealBlueprintLibrary.h"
 
 FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root)
 	: m_selfId(InvalidNodeIndex)
@@ -37,12 +36,12 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 {
 	if (ConstMode == EOctreeConstructionModes::BoundVoxels)
 	{
-		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
+		m_bounds.ShiftUpperCorner(1, 1, 1);
 	}
 	else if (ConstMode == EOctreeConstructionModes::BoundCells)
 	{
-		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, -1, -1, -1, m_bounds);
-		UVoreealBlueprintLibrary::ShiftUpperCorner(m_bounds, 1, 1, 1, m_bounds);
+		m_bounds.ShiftUpperCorner(-1, -1, -1);
+		m_bounds.ShiftUpperCorner(1, 1, 1);
 	}
 
 	int32 width = (ConstMode == EOctreeConstructionModes::BoundCells)  ? m_bounds.Width  : m_bounds.Width + 1;
@@ -86,7 +85,7 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 		depthInc--;
 	}
 
-	UVoreealBlueprintLibrary::Grow(octreeRegion, widthInc / 2, heightInc / 2, depthInc / 2, octreeRegion);
+	octreeRegion.Grow(widthInc / 2, heightInc / 2, depthInc / 2);
 
 	m_rootId = CreateNode(octreeRegion, FSparseOctreeNode::InvalidNodeIndex);
 	m_children[m_rootId]->m_depth = m_maxDepth - 1;
@@ -153,15 +152,16 @@ bool FSparseOctree::Update(const FVector& viewPosition)
 			//void* extractor = nullptr;
 
 			node->m_lastSceduledForUpdate = FTimespan(0, 0, FPlatformTime::Seconds());
-			node->m_lastSurfaceExtractionTask = MakeShareable(new FSparseOctreeTask
-			{
-				Async<int>(EAsyncExecution::ThreadPool, [/*&extractor, */&node]
-				{
-					return 1234;
-				})
-			});
+			
+			// Add Task
+			//node->m_lastSurfaceExtractionTask = MakeShareable(new FSparseOctreeTask
+			//{
+			//	Async<int>(EAsyncExecution::ThreadPool, [/*&extractor, */&node]
+			//	{
+			//		return 1234;
+			//	})
+			//});
 
-			m_tasks.Add(node->m_lastSurfaceExtractionTask);
 
 			UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
 		}
@@ -169,20 +169,7 @@ bool FSparseOctree::Update(const FVector& viewPosition)
 		return ETraverseOptions::Skip;
 	});
 
-	for (int32 i = 0; i < m_tasks.Num();)
-	{
-		auto task = m_tasks[i];
-		if (task->Task.IsReady())
-		{
-			//task.->m_node->m_lastSurfaceExtractionTask = nullptr;
-			UE_LOG(LogTemp, Warning, TEXT("Voreeal: Task Complete!"));
-			m_tasks.RemoveAt(i, 1, false);
-		}
-		else
-		{
-			i++;
-		}
-	}
+	// Get Finished Tasks
 
 	return true;
 }
@@ -216,7 +203,7 @@ void FSparseOctree::BuildNode(int32 parentId)
 			? (m_children[parentId]->m_bounds.Width) / 2
 			: (m_children[parentId]->m_bounds.Width + 1) / 2;
 
-		FIntVector min = m_children[parentId]->m_bounds.GetLower();
+		FIntVector min = m_children[parentId]->m_bounds.GetLowerInt();
 		FIntVector max = (m_constMode == EOctreeConstructionModes::BoundCells)
 			? min + FIntVector(childSize, childSize, childSize)
 			: min + FIntVector(childSize - 1, childSize - 1, childSize - 1);
@@ -233,7 +220,7 @@ void FSparseOctree::BuildNode(int32 parentId)
 			childRegion.Height = ((i < 2 || i == 4 || i == 5) ? center.Y : max.Y);
 			childRegion.Depth = (i < 4 ? center.Z : max.Z);
 
-			if (UVoreealBlueprintLibrary::Intersect(childRegion, m_bounds))
+			if (FVoreealRegion::Intersect(childRegion, m_bounds))
 			{
 				int32 node = CreateNode(childRegion, parentId);
 				m_children[parentId]->m_childrenId[i] = node;
@@ -249,7 +236,7 @@ void FSparseOctree::MarkChange(const int32& index, const FVoreealRegion& region,
 {
 	FSparseOctreeNode* node = m_children[index];
 
-	if (UVoreealBlueprintLibrary::Intersect(node->m_bounds, region))
+	if (FVoreealRegion::Intersect(node->m_bounds, region))
 	{
 		node->m_dataLastModified = changeTime;
 

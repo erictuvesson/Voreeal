@@ -6,7 +6,7 @@ UVoreealVolumeComponent::UVoreealVolumeComponent(const class FObjectInitializer&
 	: Super(ObjectInitializer)
 {
 	MeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("MeshComponent"));
-	RootComponent = MeshComponent;
+	//RootComponent = MeshComponent;
 
 	InitWorker();
 	Identifier = Runnable ? Runnable->RequestNewIdentifier() : -1;
