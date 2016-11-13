@@ -17,7 +17,9 @@ Voreeal support a few different types of actors for different kind of jobs.
 ## Getting Started
 
 Download this repository and place it in your projects under 'Plugins' do this via GIT command line or 
-a GIT client as if you download the ZIP it will not work as intended if at all this is because Polyvox is a subproject which does not download in the ZIP version. then Restart Unreal Engine 4
+a GIT client as if you download the ZIP it will not work as intended if at all this is because Polyvox is a 
+subproject which does not download in the ZIP version also remember that this plugin must go in your project **and not the engine.**
+then Restart Unreal Engine 4 
 and it will ask you to rebuild the plugin, once that is done you can just drag in any of the supported
 voxel formats into your project. 
 
