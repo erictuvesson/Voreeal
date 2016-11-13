@@ -72,7 +72,7 @@ uint32 FVoreealWorker::RequestNewIdentifier()
 TSharedPtr<FVoreealMesh, ESPMode::Fast> FVoreealWorker::GetTask(uint32 Identifier)
 {
 	int32 FoundIndex = -1;
-	FVoreealMesh* FoundResult = nullptr;
+	TSharedPtr<FVoreealMesh, ESPMode::Fast> FoundResult;
 
 	FinishedTasksMutex.lock();
 	{
@@ -81,7 +81,7 @@ TSharedPtr<FVoreealMesh, ESPMode::Fast> FVoreealWorker::GetTask(uint32 Identifie
 			if (FinishedTasks[i].Key == Identifier)
 			{
 				FoundIndex = i;
-				FoundResult = std::move(&FinishedTasks[i].Value);
+				FoundResult = MakeShareable(new FVoreealMesh(FinishedTasks[i].Value));
 				break;
 			}
 		}

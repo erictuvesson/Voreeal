@@ -139,10 +139,6 @@ public:
 	/// Mark a change in the region.
 	void MarkChange(const FVoreealRegion& region, const FTimespan& changeTime);
 	
-	/// Update the octree from the players viewpoint. 
-	/// \return true if up to date
-	bool Update(const FVector& viewPosition);
-
 private:
 	/// Create a new node.
 	int32 CreateNode(FVoreealRegion region, int32 parentId);
@@ -165,35 +161,37 @@ private:
 };
 
 template <typename TCallback>
-void FSparseOctree::Traverse(int32 targetNodeId, TCallback && result)
+void FSparseOctree::Traverse(int32 TargetNodeId, TCallback && Callback)
 {
-	if (targetNodeId == FSparseOctreeNode::InvalidNodeIndex)
+	if (TargetNodeId == FSparseOctreeNode::InvalidNodeIndex)
 	{
 		return;
 	}
 
-	int32 stackCount = 1;
-	TArray<int32> stack;
+	int32 StackCount = 1;
+	TArray<int32> Stack;
 
-	stack.Add(targetNodeId);
+	Stack.Add(TargetNodeId);
 
-	while (stackCount > 0)
+	while (StackCount > 0)
 	{
-		int32 nodeId = stack[--stackCount];
-		FSparseOctreeNode* node = GetNodeAt(nodeId);
+		int32 NodeId = Stack[--StackCount];
+		Stack.RemoveAt(StackCount);
 
-		ETraverseOptions traverseOptions = result(node);
-		if (traverseOptions == ETraverseOptions::Stop)
+		FSparseOctreeNode* Node = GetNodeAt(NodeId);
+
+		ETraverseOptions TraverseOptions = Callback(Node);
+		if (TraverseOptions == ETraverseOptions::Stop)
 			break;
 
-		if (traverseOptions == ETraverseOptions::Continue && node->m_hasChildren)
+		if (TraverseOptions == ETraverseOptions::Continue && Node->m_hasChildren)
 		{
 			for (int i = 0; i < FSparseOctreeNode::ChildrenCount; ++i)
 			{
-				if (node->m_childrenId[i] != FSparseOctreeNode::InvalidNodeIndex)
+				if (Node->m_childrenId[i] != FSparseOctreeNode::InvalidNodeIndex)
 				{
-					stack.Add(node->m_childrenId[i]);
-					stackCount++;
+					Stack.Add(Node->m_childrenId[i]);
+					StackCount++;
 				}
 			}
 		}

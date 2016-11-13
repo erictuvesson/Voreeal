@@ -136,44 +136,6 @@ void FSparseOctree::MarkChange(const FVoreealRegion& region, const FTimespan& ch
 	MarkChange(m_rootId, region, changeTime);
 }
 
-bool FSparseOctree::Update(const FVector& viewPosition)
-{
-	// Traverse all the nodes and see if they need to be updated,
-	// if so we queue a task.
-	Traverse([=](FSparseOctreeNode* node) -> ETraverseOptions
-	{
-		if (node->m_hasChildren)
-		{
-			return ETraverseOptions::Continue;
-		}
-
-		if (!node->IsUpToDate() && !node->IsSceduled() && !node->IsTaskRunning())
-		{
-			//void* extractor = nullptr;
-
-			node->m_lastSceduledForUpdate = FTimespan(0, 0, FPlatformTime::Seconds());
-			
-			// Add Task
-			//node->m_lastSurfaceExtractionTask = MakeShareable(new FSparseOctreeTask
-			//{
-			//	Async<int>(EAsyncExecution::ThreadPool, [/*&extractor, */&node]
-			//	{
-			//		return 1234;
-			//	})
-			//});
-
-
-			UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
-		}
-
-		return ETraverseOptions::Skip;
-	});
-
-	// Get Finished Tasks
-
-	return true;
-}
-
 int32 FSparseOctree::CreateNode(FVoreealRegion region, int32 parent)
 {
 	auto node = new FSparseOctreeNode(region, parent, this);

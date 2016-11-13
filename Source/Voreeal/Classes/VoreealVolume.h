@@ -55,8 +55,11 @@ public:
 
 	}
 
-	// Add a vertex
+	// Add a vertex.
 	void AddVertex(FVector Position, FVector Normal, FVector2D UV, FColor Color, FProcMeshTangent Tangent);
+
+	// Set the section.
+	void CreateSection(class UProceduralMeshComponent* ProceduralMeshComponent, bool bCreateCollision);
 
 	// Gets the options used for this extraction.
 	FVoreealExtractorOptions GetOptions() const;
@@ -127,6 +130,8 @@ public:
 template <typename TVolume, typename TVoxelType>
 inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper(TVolume* Volume, EVolumeExtractor ExtractorType, const FVoreealExtractorOptions& Options)
 {
+	PolyVox::Region PRegion = (PolyVox::Region)Options.Region;
+
 	FVoreealMesh Result = FVoreealMesh(Options);
 
 	// TODO: LOD
@@ -135,9 +140,24 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 	{
 	case EVolumeExtractor::CubicSurface:
 	{
-		//auto mesh = extractCubicMesh(Volume, Options.Region);
+		auto mesh = extractCubicMesh(Volume, PRegion);
 
-		// Convert Mesh
+		for (int32 i = 0; i < (int32)mesh.getNoOfVertices(); i++)
+		{
+			auto vertex = decodeVertex(mesh.getVertex(i));
+			
+			FVector VertexPosition = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
+			FVector Normal = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
+			Result.Vertices.Add(VertexPosition);
+			Result.Normals.Add(Normal);
+		}
+
+		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i++)
+		{
+			auto index = mesh.getIndex(i);
+
+			Result.Triangles.Add((int32)index);
+		}
 
 		break;
 	}

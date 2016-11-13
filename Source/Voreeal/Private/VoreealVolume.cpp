@@ -10,6 +10,12 @@ void FVoreealMesh::AddVertex(FVector Position, FVector Normal, FVector2D UV, FCo
 	Tangents.Add(Tangent);
 }
 
+void FVoreealMesh::CreateSection(UProceduralMeshComponent* ProceduralMeshComponent, bool bCreateCollision)
+{
+	ProceduralMeshComponent->CreateMeshSection(
+		Options.Identifier, Vertices, Triangles, Normals, UV0, VertexColors, Tangents, bCreateCollision);
+}
+
 FVoreealExtractorOptions FVoreealMesh::GetOptions() const
 {
 	return Options;

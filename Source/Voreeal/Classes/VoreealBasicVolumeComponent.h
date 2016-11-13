@@ -31,9 +31,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
 	void DrawDebugOctree(const FColor& Color, float Duration, float Thickness);
 
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|Debug")
+	void Update();
+
 private:
 	void EnsureRendering();
-	void Update();
 
 private:
 	FSparseOctree* m_octree;

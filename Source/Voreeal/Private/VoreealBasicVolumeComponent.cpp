@@ -106,8 +106,39 @@ void UBasicVolumeComponent::Update()
 {
 	if (m_octree)
 	{
-		//MeshComponent->CreateMeshSection();
+		// Traverse all the nodes and see if they need to be updated,
+		// if so we queue a task.
+		m_octree->Traverse([=](FSparseOctreeNode* node) -> ETraverseOptions
+		{
+			if (node->m_hasChildren)
+			{
+				return ETraverseOptions::Continue;
+			}
 
-		//m_octree->Update(FVector(0, 0, 0));
+			if (!node->IsUpToDate() && !node->IsSceduled() && !node->IsTaskRunning())
+			{
+				node->m_lastSceduledForUpdate = FTimespan(0, 0, FPlatformTime::Seconds());
+
+				FVoreealExtractorOptions Options(node->m_selfId, node->m_bounds, 0);
+
+				AddTask(Volume, Options);
+
+				UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
+			}
+
+			return ETraverseOptions::Skip;
+		});
+
+		// Get Finished Tasks
+		TSharedPtr<FVoreealMesh> Task;
+		while (FindFinishedTask(Task))
+		{
+			if (Task.IsValid())
+			{
+				Task.Get()->CreateSection(MeshComponent, true);
+
+				UE_LOG(LogTemp, Warning, TEXT("Voreeal: Finish Task!"));
+			}
+		}
 	}
 }
