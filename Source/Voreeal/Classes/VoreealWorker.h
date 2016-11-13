@@ -1,7 +1,5 @@
 #pragma once
 
-#include "VoreealMeshExtractors.h"
-
 #include <mutex>
 
 class FVoreealWorker : public FRunnable

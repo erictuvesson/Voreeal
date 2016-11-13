@@ -37,12 +37,6 @@ void UVoreealVolumeComponent::AddTask(UVoreealVolume* Volume, const FVoreealExtr
 		return; // Volume is null
 	}
 
-	if (!Volume->MeshExtractor)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Task: Mesh Extractor is null."));
-		return; // Mesh Extractor is null
-	}
-
 	if (Options.Region.Width <= 0 ||
 		Options.Region.Height <= 0)
 	{
@@ -54,8 +48,7 @@ void UVoreealVolumeComponent::AddTask(UVoreealVolume* Volume, const FVoreealExtr
 	{
 		Runnable->AddTask(Identifier, [Volume, Options]() -> FVoreealMesh
 		{
-			return Volume->MeshExtractor.GetDefaultObject()
-				->ExtractMesh(Volume, Options);
+			return Volume->ExtractMesh(Options);
 		});
 	}
 	else

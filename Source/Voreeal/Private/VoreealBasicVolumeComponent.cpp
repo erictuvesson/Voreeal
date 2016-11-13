@@ -106,6 +106,8 @@ void UBasicVolumeComponent::Update()
 {
 	if (m_octree)
 	{
+		//MeshComponent->CreateMeshSection();
+
 		//m_octree->Update(FVector(0, 0, 0));
 	}
 }

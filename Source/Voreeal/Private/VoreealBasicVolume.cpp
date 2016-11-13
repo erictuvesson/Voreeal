@@ -81,6 +81,11 @@ bool UBasicVolume::IsValid() const
 	return Volume != nullptr;
 }
 
+FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
+{
+	return ExtractMeshHelper(Volume.get(), ExtractorType, Options);
+}
+
 bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);

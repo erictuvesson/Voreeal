@@ -1,7 +1,6 @@
 #pragma once
 
 #include "VoreealWorker.h"
-#include "VoreealMeshExtractors.h"
 #include "VoreealVolumeComponent.generated.h"
 
 UCLASS(Abstract)

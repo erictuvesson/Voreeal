@@ -1,6 +1,30 @@
 #include "VoreealPrivatePCH.h"
 #include "VoreealVolume.h"
 
+void FVoreealMesh::AddVertex(FVector Position, FVector Normal, FVector2D UV, FColor Color, FProcMeshTangent Tangent)
+{
+	Vertices.Add(Position);
+	Normals.Add(Normal);
+	UV0.Add(UV);
+	VertexColors.Add(Color);
+	Tangents.Add(Tangent);
+}
+
+FVoreealExtractorOptions FVoreealMesh::GetOptions() const
+{
+	return Options;
+}
+
+void UVoreealVolume::SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color) 
+{
+	SetVoxel(FVector(X, Y, Z), Color);
+}
+
+void UVoreealVolume::SetVoxel(const FIntVector& Location, const FColor& Color)
+{
+	SetVoxel(FVector(Location.X, Location.Y, Location.Z), Color);
+}
+
 void UVoreealVolume::SetVoxel(const FVector& Location, const FColor& Color)
 {
 	// TODO: Check if valid? Currently not doing because of performance.
@@ -31,6 +55,12 @@ bool UVoreealVolume::IsValid() const
 {
 	check(0 && "abstract");
 	return false;
+}
+
+FVoreealMesh UVoreealVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
+{
+	check(0 && "abstract");
+	return FVoreealMesh(Options);
 }
 
 bool UVoreealVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)

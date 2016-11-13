@@ -3,10 +3,67 @@
 #include <ProceduralMeshComponent.h>
 
 #include "VoreealRegion.h"
-#include "VoreealMeshExtractors.h"
 #include "VoreealVolume.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FVoreealRegion, Region);
+
+UENUM(BlueprintType)
+enum class EVolumeExtractor : uint8
+{
+	// Cubic Surface Extractor, extracts the voxels as cubes like Minecraft.
+	CubicSurface,
+	// Marching Cubes Surface Extractor, extracts the voxels as smooth terrain.
+	MarchingCubesSurface
+};
+
+// Extractor Options
+struct VOREEAL_API FVoreealExtractorOptions
+{
+	// Used to identify for example which node it was in a octree.
+	int32 Identifier;
+
+	// The region to extract.
+	FVoreealRegion Region;
+
+	// The level of detail we are extracting.
+	int32 LOD;
+
+	FVoreealExtractorOptions(int32 Identifier, FVoreealRegion Region, int32 LOD)
+		: Identifier(Identifier)
+		, Region(Region)
+		, LOD(LOD)
+	{
+
+	}
+};
+
+// Extracted Mesh
+class VOREEAL_API FVoreealMesh
+{
+public:
+	TArray<FVector> Vertices;
+	TArray<int32> Triangles;
+	TArray<FVector> Normals;
+	TArray<FVector2D> UV0;
+	TArray<FColor> VertexColors;
+	TArray<FProcMeshTangent> Tangents;
+
+public:
+	FVoreealMesh(FVoreealExtractorOptions Options)
+		: Options(Options)
+	{
+
+	}
+
+	// Add a vertex
+	void AddVertex(FVector Position, FVector Normal, FVector2D UV, FColor Color, FProcMeshTangent Tangent);
+
+	// Gets the options used for this extraction.
+	FVoreealExtractorOptions GetOptions() const;
+
+private:
+	FVoreealExtractorOptions Options;
+};
 
 /** Base Voxel Volume, used as a data format. */
 UCLASS(Abstract)
@@ -15,40 +72,35 @@ class VOREEAL_API UVoreealVolume : public UObject
 	GENERATED_BODY()
 
 public:
-	/// Occures when the volume has changed.
+	// Occures when the volume has changed.
 	UPROPERTY(BlueprintAssignable, Category = "Voreeal")
 	FVolumeChanged OnChanged;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Voreeal")
-	TSubclassOf<UVoreealMeshExtractor> MeshExtractor;
+	EVolumeExtractor ExtractorType;
 
 public:
-	///// Extract mesh.
-	//UFUNCTION(BlueprintCallable, Category = Voreeal)
-	//virtual void ExtractMesh(const FVoreealRegion& Region, const int32& LOD, FProceduralMesh& Mesh);
-
-	/// Set Voxel at Location.
+	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color) {
-		SetVoxel(FVector(X, Y, Z), Color);
-	}
+	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color);
 
-	/// Set Voxel at Location.
-	void SetVoxel(const FIntVector& Location, const FColor& Color) {
-		SetVoxel(FVector(Location.X, Location.Y, Location.Z), Color);
-	}
+	// Set Voxel at Location.
+	void SetVoxel(const FIntVector& Location, const FColor& Color);
 
-	/// Set Voxel at Location.
+	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void SetVoxel(const FVector& Location, const FColor& Color);
 	
-	/// Get Voxel at Location.
+	// Get Voxel at Location.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	void GetVoxel(const FVector& Location, FColor& Color);
 
-	/// Checks if the volume is valid.
+	// Checks if the volume is valid.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	virtual bool IsValid() const;
+
+	// Extract part of the volume.
+	virtual FVoreealMesh ExtractMesh(const FVoreealExtractorOptions& Options);
 
 public:
 	void SerializeVolume(FArchive& Ar, FVoreealRegion& Region);
@@ -59,3 +111,45 @@ protected:
 	virtual void Internal_GetVoxel(const FVector& Location, uint32& Data);
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 };
+
+// Helper class for extracting meshes
+// I just dont want to write the same code twice
+template <typename TVolume, typename TVoxelType>
+class VoreealExtractHelper
+{
+public:
+	typedef TVoxelType	VoxelType;
+	typedef TVolume		VolumeType;
+
+	FVoreealMesh ExtractMeshHelper(TVolume* Volume, EVolumeExtractor ExtractorType, const FVoreealExtractorOptions& Options);
+};
+
+template <typename TVolume, typename TVoxelType>
+inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper(TVolume* Volume, EVolumeExtractor ExtractorType, const FVoreealExtractorOptions& Options)
+{
+	FVoreealMesh Result = FVoreealMesh(Options);
+
+	// TODO: LOD
+
+	switch (ExtractorType)
+	{
+	case EVolumeExtractor::CubicSurface:
+	{
+		//auto mesh = extractCubicMesh(Volume, Options.Region);
+
+		// Convert Mesh
+
+		break;
+	}
+	case EVolumeExtractor::MarchingCubesSurface:
+	{
+		//auto mesh = extractMarchingCubesMesh(Volume, Options.Region);
+
+		// Convert Mesh
+
+		break;
+	}
+	}
+
+	return Result;
+}
