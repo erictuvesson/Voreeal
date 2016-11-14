@@ -56,21 +56,20 @@ struct FSparseOctreeNode
 	/// The bounds of this node.
 	FVoreealRegion m_bounds;
 
-	/// The current depth of this node. (this is in reverse)
-	int32 m_depth;
+	/// The current height of this node.
+	int32 m_height;
 
 	FTimespan m_dataLastModified;
 	FTimespan m_lastSceduledForUpdate;
 	FTimespan m_meshLastChanged;
-	//FTimespan m_nodeOrChildrenLastChanged;
 
 	/// Constructor
-	FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSparseOctree* root);
+	FSparseOctreeNode(FVoreealRegion Region, int32 ParentId, FSparseOctree* Root);
 
 	/// Gets if the mesh is up to date.
 	FORCEINLINE bool IsUpToDate() const 
 	{ 
-		return m_meshLastChanged > m_dataLastModified; 
+		return (m_meshLastChanged > m_dataLastModified); 
 	}
 
 	/// Gets if the mesh is sceduled for update.
@@ -110,7 +109,7 @@ public:
 	FSparseOctreeNode* GetRoot() const;
 
 	/// Gets the node from index.
-	FSparseOctreeNode* GetNodeAt(int32 index);
+	FSparseOctreeNode* GetNodeAt(int32 Index);
 
 	/// Gets the octree region.
 	FVoreealRegion GetRegion() const;
@@ -121,33 +120,37 @@ public:
 	/// Gets the node count.
 	int32 GetCount() const;
 
+	/// Validate the octree
+	/// \return bottom node count
+	int32 Validate();
+
 	/// Treverse the nodes.
 	/// @result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
 	template <typename TCallback>
-	inline void Traverse(TCallback && result) {
-		Traverse(m_rootId, result);
+	inline void Traverse(TCallback && Callback) {
+		Traverse(m_rootId, Callback);
 	}
 
 	/// Treverse the node.
 	/// @result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
 	template <typename TCallback>
-	void Traverse(int32 targetNodeId, TCallback && result);
+	void Traverse(int32 TargetNodeId, TCallback && Callback);
 
 	/// Mark a change at the position.
-	void MarkChange(const FIntVector& position, const FTimespan& changeTime);
+	void MarkChange(const FIntVector& Position, const FTimespan& ChangeTime);
 
 	/// Mark a change in the region.
-	void MarkChange(const FVoreealRegion& region, const FTimespan& changeTime);
+	void MarkChange(const FVoreealRegion& Region, const FTimespan& ChangeTime);
 	
 private:
 	/// Create a new node.
-	int32 CreateNode(FVoreealRegion region, int32 parentId);
+	int32 CreateNode(FVoreealRegion Region, int32 ParentId);
 
 	/// Build all parent nodes.
-	void BuildNode(int32 parentId);
+	void BuildNode(int32 ParentId);
 
 	/// Mark a change in the region.
-	void MarkChange(const int32& index, const FVoreealRegion& region, const FTimespan& changeTime);
+	void MarkChange(const int32& Index, const FVoreealRegion& Region, const FTimespan& ChangeTime);
 
 private:
 	UVoreealVolumeComponent* m_volumeComponent;

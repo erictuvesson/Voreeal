@@ -5,8 +5,15 @@
 UVoreealVolumeComponent::UVoreealVolumeComponent(const class FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	MeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("MeshComponent"));
-	//RootComponent = MeshComponent;
+	static ConstructorHelpers::FObjectFinder<UMaterial> Material(TEXT("Material'/Voreeal/VertexColorMaterial.VertexColorMaterial'"));
+
+	MeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
+	MeshComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+
+	if (Material.Object != NULL)
+	{
+		MeshComponent->SetMaterial(0, Material.Object);
+	}
 
 	InitWorker();
 	Identifier = Runnable ? Runnable->RequestNewIdentifier() : -1;

@@ -11,12 +11,17 @@ FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSpa
 	, m_hasChildren(false)
 	, m_root(root)
 	, m_bounds(region)
-	, m_depth(InvalidNodeIndex)
+	, m_height(0)
+	, m_dataLastModified(0)
+	, m_lastSceduledForUpdate(0)
+	, m_meshLastChanged(0)
 {
 	for (int32 i = 0; i < ChildrenCount; i++)
 	{
 		m_childrenId[i] = InvalidNodeIndex;
 	}
+
+	m_dataLastModified = FTimespan(0, 0, FPlatformTime::Seconds());
 }
 
 FSparseOctree::FSparseOctree(UBasicVolume* Volume, UVoreealVolumeComponent* VolumeComponent,
@@ -88,9 +93,10 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 	octreeRegion.Grow(widthInc / 2, heightInc / 2, depthInc / 2);
 
 	m_rootId = CreateNode(octreeRegion, FSparseOctreeNode::InvalidNodeIndex);
-	m_children[m_rootId]->m_depth = m_maxDepth - 1;
 
 	BuildNode(m_rootId);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Octree: Child Nodes %d"), Validate());
 }
 
 FSparseOctree::~FSparseOctree()
@@ -126,6 +132,25 @@ int32 FSparseOctree::GetCount() const
 	return m_children.Num();
 }
 
+int32 FSparseOctree::Validate()
+{
+	int32 Count = 0;
+
+	Traverse([&Count](FSparseOctreeNode* node) -> ETraverseOptions
+	{
+		if (node->m_hasChildren)
+		{
+			return ETraverseOptions::Continue;
+		}
+
+		Count++;
+
+		return ETraverseOptions::Continue;
+	});
+
+	return Count;
+}
+
 void FSparseOctree::MarkChange(const FIntVector& position, const FTimespan& changeTime)
 {
 	MarkChange(m_rootId, FVoreealRegion(position.X, position.Y, position.Z, 1, 1, 1), changeTime);
@@ -142,7 +167,7 @@ int32 FSparseOctree::CreateNode(FVoreealRegion region, int32 parent)
 
 	if (parent != FSparseOctreeNode::InvalidNodeIndex)
 	{
-		node->m_depth = m_children[parent]->m_depth + 1;
+		node->m_height = m_children[parent]->m_height + 1;
 	}
 
 	m_children.Add(node);
@@ -155,61 +180,65 @@ int32 FSparseOctree::CreateNode(FVoreealRegion region, int32 parent)
 
 void FSparseOctree::BuildNode(int32 parentId)
 {
-	int32 parentSize = (m_constMode == EOctreeConstructionModes::BoundCells) 
-		? m_children[parentId]->m_bounds.Width
-		: m_children[parentId]->m_bounds.Width + 1;
+	FSparseOctreeNode* ParentNode = m_children[parentId];
+	FVector ParentNodeSize = ParentNode->m_bounds.Size();
 
-	if (parentSize > 16 /*mBaseNodeSize*/)
+	int32 ParentSize = (m_constMode == EOctreeConstructionModes::BoundCells) 
+		? ParentNodeSize.X
+		: ParentNodeSize.X + 1;
+
+	if (ParentSize > 32 /*mBaseNodeSize*/ &&
+		ParentNode->m_height < 2)
 	{
-		int32 childSize = (m_constMode == EOctreeConstructionModes::BoundCells) 
-			? (m_children[parentId]->m_bounds.Width) / 2
-			: (m_children[parentId]->m_bounds.Width + 1) / 2;
+		int32 ChildSize = (m_constMode == EOctreeConstructionModes::BoundCells) 
+			? (ParentNodeSize.X) / 2
+			: (ParentNodeSize.X + 1) / 2;
 
-		FIntVector min = m_children[parentId]->m_bounds.GetLowerInt();
-		FIntVector max = (m_constMode == EOctreeConstructionModes::BoundCells)
-			? min + FIntVector(childSize, childSize, childSize)
-			: min + FIntVector(childSize - 1, childSize - 1, childSize - 1);
+		FIntVector Min = ParentNode->m_bounds.GetLowerInt();
+		FIntVector Max = (m_constMode == EOctreeConstructionModes::BoundCells)
+			? Min + FIntVector(ChildSize,	  ChildSize,	 ChildSize)
+			: Min + FIntVector(ChildSize - 1, ChildSize - 1, ChildSize - 1);
 
-		FIntVector center = (min.Size() > max.Size()) ? min - max : max - min;
+		FIntVector Center = (Min.Size() > Max.Size()) ? Min - Max : Max - Min;
 
-		for (int i = 0; i < FSparseOctreeNode::ChildrenCount; i++)
+		for (int32 i = 0; i < FSparseOctreeNode::ChildrenCount; i++)
 		{
-			FVoreealRegion childRegion;
-			childRegion.X = (i % 2 == 0 ? min.X : center.X);
-			childRegion.Y = ((i < 2 || i == 4 || i == 5) ? min.Y : center.Y);
-			childRegion.Z = (i < 4 ? min.Z : center.Z);
-			childRegion.Width = (i % 2 == 0 ? center.X : max.X);
-			childRegion.Height = ((i < 2 || i == 4 || i == 5) ? center.Y : max.Y);
-			childRegion.Depth = (i < 4 ? center.Z : max.Z);
+			FVoreealRegion ChildRegion;
+			ChildRegion.X = (i % 2 == 0 ? Min.X : Center.X);
+			ChildRegion.Y = ((i < 2 || i == 4 || i == 5) ? Min.Y : Center.Y);
+			ChildRegion.Z = (i < 4 ? Min.Z : Center.Z);
+			ChildRegion.Width  = (i % 2 == 0 ? Center.X : Max.X);
+			ChildRegion.Height = ((i < 2 || i == 4 || i == 5) ? Center.Y : Max.Y);
+			ChildRegion.Depth  = (i < 4 ? Center.Z : Max.Z);
 
-			if (FVoreealRegion::Intersect(childRegion, m_bounds))
+			if (FVoreealRegion::Intersect(ChildRegion, m_bounds))
 			{
-				int32 node = CreateNode(childRegion, parentId);
-				m_children[parentId]->m_childrenId[i] = node;
-				m_children[parentId]->m_hasChildren = true;
+				int32 Node = CreateNode(ChildRegion, parentId);
+				ParentNode->m_childrenId[i] = Node;
+				ParentNode->m_hasChildren = true;
 
-				BuildNode(node);
+				BuildNode(Node);
 			}
 		}
 	}
 }
 
-void FSparseOctree::MarkChange(const int32& index, const FVoreealRegion& region, const FTimespan& changeTime)
+void FSparseOctree::MarkChange(const int32& Index, const FVoreealRegion& Region, const FTimespan& ChangeTime)
 {
-	FSparseOctreeNode* node = m_children[index];
+	FSparseOctreeNode* Node = m_children[Index];
 
-	if (FVoreealRegion::Intersect(node->m_bounds, region))
+	if (FVoreealRegion::Intersect(Node->m_bounds, Region))
 	{
-		node->m_dataLastModified = changeTime;
+		Node->m_dataLastModified = ChangeTime;
 
-		if (node->m_hasChildren)
+		if (Node->m_hasChildren)
 		{
 			for (int32 i = 0; i < FSparseOctreeNode::ChildrenCount; i++)
 			{
-				int32 childIndex = node->m_childrenId[i];
-				if (childIndex != FSparseOctreeNode::InvalidNodeIndex)
+				int32 ChildIndex = Node->m_childrenId[i];
+				if (ChildIndex != FSparseOctreeNode::InvalidNodeIndex)
 				{
-					MarkChange(index, region, changeTime);
+					MarkChange(Index, Region, ChangeTime);
 				}
 			}
 		}

@@ -29,7 +29,7 @@ public:
 	virtual bool SetBasicVolume(UBasicVolume* NewVolume);
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
-	void DrawDebugOctree(const FColor& Color, float Duration, float Thickness);
+	void DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness);
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Debug")
 	void Update();

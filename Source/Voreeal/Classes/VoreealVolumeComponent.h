@@ -9,7 +9,7 @@ class VOREEAL_API UVoreealVolumeComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleInstanceOnly, Category = "Voreeal")
+	UPROPERTY(VisibleAnywhere, Category = "Voreeal")
 	class UProceduralMeshComponent* MeshComponent;
 
 public:

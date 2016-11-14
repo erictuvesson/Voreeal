@@ -136,22 +136,22 @@ struct VOREEAL_API FVoreealRegion
 
 FORCEINLINE FVector FVoreealRegion::GetUpper() const
 {
-	return FVector(X, Y, Z);
+	return FVector(X + Width, Y + Height, Z + Depth);
 }
 
 FORCEINLINE FVector FVoreealRegion::GetLower() const
 {
-	return FVector(X + Width, Y + Height, Z + Depth);
+	return FVector(X, Y, Z);
 }
 
 FORCEINLINE FIntVector FVoreealRegion::GetUpperInt() const
-{ 
-	return FIntVector(X, Y, Z); 
+{
+	return FIntVector(X + Width, Y + Height, Z + Depth);
 }
 
 FORCEINLINE FIntVector FVoreealRegion::GetLowerInt() const
-{ 
-	return FIntVector(X + Width, Y + Height, Z + Depth); 
+{
+	return FIntVector(X, Y, Z);
 }
 
 FORCEINLINE FVector FVoreealRegion::GetCenter() const

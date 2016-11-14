@@ -72,7 +72,7 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 	return true;
 }
 
-void UBasicVolumeComponent::DrawDebugOctree(const FColor& Color, float Duration, float Thickness)
+void UBasicVolumeComponent::DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness)
 {
 	if (m_octree)
 	{
@@ -83,7 +83,8 @@ void UBasicVolumeComponent::DrawDebugOctree(const FColor& Color, float Duration,
 				return ETraverseOptions::Continue;
 			}
 
-			UVoreealBlueprintLibrary::DrawDebugRegion(this, this->GetComponentTransform(), node->m_bounds, Color, Duration, Thickness);
+			UVoreealBlueprintLibrary::DrawDebugRegion(this, this->GetComponentTransform(), 
+				node->m_bounds, Color.ToFColor(true), Duration, Thickness);
 
 			return ETraverseOptions::Skip;
 		});
@@ -123,10 +124,10 @@ void UBasicVolumeComponent::Update()
 
 				AddTask(Volume, Options);
 
-				UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
+				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
 			}
 
-			return ETraverseOptions::Skip;
+			return ETraverseOptions::Continue;
 		});
 
 		// Get Finished Tasks
@@ -135,9 +136,14 @@ void UBasicVolumeComponent::Update()
 		{
 			if (Task.IsValid())
 			{
-				Task.Get()->CreateSection(MeshComponent, true);
+				FVoreealMesh* Mesh = Task.Get();
 
-				UE_LOG(LogTemp, Warning, TEXT("Voreeal: Finish Task!"));
+				Mesh->CreateSection(MeshComponent, true);
+				
+				FSparseOctreeNode* Node = m_octree->GetNodeAt(Mesh->GetOptions().Identifier);
+				Node->m_meshLastChanged = FTimespan(0, 0, FPlatformTime::Seconds());
+
+				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Finish Task!"));
 			}
 		}
 	}

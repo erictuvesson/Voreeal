@@ -51,6 +51,6 @@ public:
 	/// Draw Debug Region, 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Region|Debug", meta = (WorldContext = "WorldContextObject"))
 	static void DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform, const FVoreealRegion& Region,
-		const FColor& Color, float Duration, float Thickness);
+		const FLinearColor& LinearColor, float Duration, float Thickness);
 
 };
