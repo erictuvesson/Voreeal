@@ -131,11 +131,13 @@ template <typename TVolume, typename TVoxelType>
 inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper(TVolume* Volume, EVolumeExtractor ExtractorType, const FVoreealExtractorOptions& Options)
 {
 	PolyVox::Region PRegion = (PolyVox::Region)Options.Region;
+	FVector RegionLower = Options.Region.GetLower().GetAbs();
 
 	FVoreealMesh Result = FVoreealMesh(Options);
 
 	// TODO: LOD
 
+	// TODO: handle voxel data
 	switch (ExtractorType)
 	{
 	case EVolumeExtractor::CubicSurface:
@@ -147,25 +149,59 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			auto vertex = decodeVertex(mesh.getVertex(i));
 			
 			FVector VertexPosition = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
-			FVector Normal = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
-			Result.Vertices.Add(VertexPosition);
-			Result.Normals.Add(Normal);
+			FVector VertexNormal = FVector(vertex.normal.getX(), vertex.normal.getY(), vertex.normal.getZ()); 
+			// Normals are not supported by CubicSurface Extractor, so this should probably be removed.
+
+			Result.Vertices.Add(RegionLower + VertexPosition);
+			Result.Normals.Add(VertexNormal);
+			
+			FColor Color;
+			Color.R = (vertex.data & 0x000000FF);
+			Color.G = (vertex.data & 0x0000FF00) >> 8;
+			Color.B = (vertex.data & 0x00FF0000) >> 16;
+			Color.A = (vertex.data & 0xFF000000) >> 24;
+
+			Result.VertexColors.Add(Color);
 		}
 
-		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i++)
+		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i += 3)
 		{
-			auto index = mesh.getIndex(i);
+			auto Index1 = mesh.getIndex(i);
+			auto Index2 = mesh.getIndex(i + 1);
+			auto Index3 = mesh.getIndex(i + 2);
 
-			Result.Triangles.Add((int32)index);
+			Result.Triangles.Add((int32)Index1);
+			Result.Triangles.Add((int32)Index2);
+			Result.Triangles.Add((int32)Index3);
 		}
 
 		break;
 	}
 	case EVolumeExtractor::MarchingCubesSurface:
 	{
-		//auto mesh = extractMarchingCubesMesh(Volume, Options.Region);
+		auto mesh = extractMarchingCubesMesh(Volume, PRegion);
 
-		// Convert Mesh
+		for (int32 i = 0; i < (int32)mesh.getNoOfVertices(); i++)
+		{
+			auto vertex = decodeVertex(mesh.getVertex(i));
+
+			FVector VertexPosition = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
+			FVector VertexNormal = FVector(vertex.normal.getX(), vertex.normal.getY(), vertex.normal.getZ());
+
+			Result.Vertices.Add(RegionLower + VertexPosition);
+			Result.Normals.Add(VertexNormal);
+		}
+
+		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i += 3)
+		{
+			auto Index1 = mesh.getIndex(i);
+			auto Index2 = mesh.getIndex(i + 1);
+			auto Index3 = mesh.getIndex(i + 2);
+
+			Result.Triangles.Add((int32)Index3);
+			Result.Triangles.Add((int32)Index2);
+			Result.Triangles.Add((int32)Index1);
+		}
 
 		break;
 	}

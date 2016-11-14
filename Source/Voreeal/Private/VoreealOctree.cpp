@@ -199,7 +199,7 @@ void FSparseOctree::BuildNode(int32 parentId)
 			? Min + FIntVector(ChildSize,	  ChildSize,	 ChildSize)
 			: Min + FIntVector(ChildSize - 1, ChildSize - 1, ChildSize - 1);
 
-		FIntVector Center = (Min.Size() > Max.Size()) ? Min - Max : Max - Min;
+		FIntVector Center = (Min + Max) / 2;
 
 		for (int32 i = 0; i < FSparseOctreeNode::ChildrenCount; i++)
 		{
