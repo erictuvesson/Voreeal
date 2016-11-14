@@ -5,6 +5,20 @@
 #include "VoreealVolume.h"
 #include "VoreealBasicVolume.generated.h"
 
+USTRUCT()
+struct FBasicVolumeSocket
+{
+	GENERATED_BODY()
+
+	// Transform in pivot space (*not* texture space)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sockets")
+	FTransform LocalTransform;
+
+	// Name of the socket
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sockets")
+	FName SocketName;
+};
+
 /**
  * Basic Voxel Volume; Enclosed volume with just basic LOD.
  */
@@ -14,16 +28,21 @@ class VOREEAL_API UBasicVolume
 	, public VoreealExtractHelper<PolyVox::RawVolume<uint32>, uint32>
 {
 	GENERATED_BODY()
-	
+
+public:
+	// List of sockets on this volume.
+	UPROPERTY(Category = Sprite, EditAnywhere)
+	TArray<FBasicVolumeSocket> Sockets;
+
 public:
 	UBasicVolume(const class FObjectInitializer& ObjectInitializer);
 
 	// Begin UObject Interface.
 	virtual void Serialize(FArchive& Ar) override;
-	virtual void PostInitProperties() override;
 	virtual void PostLoad() override;
 #if WITH_EDITORONLY_DATA
 	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 	// End UObject Interface
 
@@ -31,7 +50,7 @@ public:
 	virtual bool IsValid() const override;
 	virtual FVoreealMesh ExtractMesh(const FVoreealExtractorOptions& Options) override;
 	// End UVoreealVolume Interface
-	
+
 	// Gets the enclosing region.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	FVoreealRegion GetEnclosingRegion() const;
@@ -50,6 +69,24 @@ public:
 	//class UAssetImportData* AssetImportData;
 	class USceneThumbnailInfo* ThumbnailInfo;
 #endif
+
+#if WITH_EDITOR
+	// Make sure all socket names are valid
+	// All duplicate / empty names will be made unique
+	void ValidateSocketNames();
+
+	// Removes the specified socket
+	void RemoveSocket(FName SocketName);
+#endif
+
+	// Search for a socket (note: do not cache this pointer; it's unsafe if the Socket array is edited)
+	FBasicVolumeSocket* FindSocket(FName SocketName);
+
+	// Returns true if the sprite has any sockets
+	bool HasAnySockets() const { return Sockets.Num() > 0; }
+
+	// Returns a list of all of the sockets
+	void QuerySupportedSockets(TArray<FComponentSocketDescription>& OutSockets) const;
 
 protected:
 	virtual bool Internal_SetVoxel(const FVector& Location, const uint32& Data) override;

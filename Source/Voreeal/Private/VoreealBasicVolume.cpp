@@ -28,24 +28,6 @@ void UBasicVolume::Serialize(FArchive& Ar)
 	}
 
 	Ar << ImportedData;
-
-//#if WITH_EDITORONLY_DATA
-//	if (Ar.IsLoading() && (AssetImportData == nullptr))
-//	{
-//		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
-//	}
-//#endif
-}
-
-void UBasicVolume::PostInitProperties()
-{
-//#if WITH_EDITORONLY_DATA
-//	if (!HasAnyFlags(RF_ClassDefaultObject))
-//	{
-//		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
-//	}
-//#endif
-	Super::PostInitProperties();
 }
 
 void UBasicVolume::PostLoad()
@@ -68,11 +50,17 @@ void UBasicVolume::PostLoad()
 #if WITH_EDITORONLY_DATA
 void UBasicVolume::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const
 {
+	Super::GetAssetRegistryTags(OutTags);
+	
 	//if (AssetImportData)
 	//{
 	//	OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
 	//}
-	Super::GetAssetRegistryTags(OutTags);
+}
+
+void UBasicVolume::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif
 
@@ -132,5 +120,82 @@ void UBasicVolume::ResizeRegion(const FVoreealRegion& NewRegion)
 	else
 	{
 		Volume.reset(new VolumeType((PolyVox::Region)NewRegion));
+	}
+}
+
+#if WITH_EDITOR
+void UBasicVolume::ValidateSocketNames()
+{
+	TSet<FName> SocketNames;
+	struct Local
+	{
+		static FName GetUniqueName(const TSet<FName>& InSocketNames, FName Name)
+		{
+			int Counter = Name.GetNumber();
+			FName TestName;
+			do
+			{
+				TestName = Name;
+				TestName.SetNumber(++Counter);
+			} while (InSocketNames.Contains(TestName));
+
+			return TestName;
+		}
+	};
+
+	bool bHasChanged = false;
+	for (int32 SocketIndex = 0; SocketIndex < Sockets.Num(); ++SocketIndex)
+	{
+		FBasicVolumeSocket& Socket = Sockets[SocketIndex];
+		if (Socket.SocketName.IsNone())
+		{
+			Socket.SocketName = Local::GetUniqueName(SocketNames, FName(TEXT("Socket")));
+			bHasChanged = true;
+		}
+		else if (SocketNames.Contains(Socket.SocketName))
+		{
+			Socket.SocketName = Local::GetUniqueName(SocketNames, Socket.SocketName);
+			bHasChanged = true;
+		}
+
+		// Add the corrected name
+		SocketNames.Add(Socket.SocketName);
+	}
+
+	if (bHasChanged)
+	{
+		PostEditChange();
+	}
+}
+
+void UBasicVolume::RemoveSocket(FName SocketName)
+{
+	Sockets.RemoveAll([=](const FBasicVolumeSocket& Socket)
+	{ 
+		return Socket.SocketName == SocketName; 
+	});
+}
+#endif
+
+FBasicVolumeSocket* UBasicVolume::FindSocket(FName SocketName)
+{
+	for (int32 SocketIndex = 0; SocketIndex < Sockets.Num(); ++SocketIndex)
+	{
+		FBasicVolumeSocket& Socket = Sockets[SocketIndex];
+		if (Socket.SocketName == SocketName)
+		{
+			return &Socket;
+		}
+	}
+
+	return nullptr;
+}
+
+void UBasicVolume::QuerySupportedSockets(TArray<FComponentSocketDescription>& OutSockets) const
+{
+	for (int32 SocketIndex = 0; SocketIndex < Sockets.Num(); ++SocketIndex)
+	{
+		const FBasicVolumeSocket& Socket = Sockets[SocketIndex];
+		new (OutSockets) FComponentSocketDescription(Socket.SocketName, EComponentSocketType::Socket);
 	}
 }
