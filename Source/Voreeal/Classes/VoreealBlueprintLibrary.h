@@ -4,7 +4,7 @@
 #include "VoreealBlueprintLibrary.generated.h"
 
 UCLASS()
-class UVoreealBlueprintLibrary : public UBlueprintFunctionLibrary
+class VOREEAL_API UVoreealBlueprintLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

@@ -7,8 +7,7 @@ public class VoreealEditor : ModuleRules
 		PrivateIncludePaths.AddRange(
 			new string[]
 			{
-				"VoreealEditor/Private",
-				"VoreealEditor/Private/Tests",
+				"VoreealEditor/Private"
 			});
 
 		PrivateDependencyModuleNames.AddRange(
@@ -16,7 +15,6 @@ public class VoreealEditor : ModuleRules
 			{
 				"Core",
 				"CoreUObject",
-				"Json",
 				"Slate",
 				"SlateCore",
 				"Engine",
@@ -26,7 +24,6 @@ public class VoreealEditor : ModuleRules
 				"Kismet",  // for FWorkflowCentricApplication
 				"PropertyEditor",
 				"RenderCore",
-				"Paper2D",
 				"ContentBrowser",
 				"WorkspaceMenuStructure",
 				"EditorStyle",

@@ -7,7 +7,7 @@
 
 /** Basic Voxel Volume Component, a fixed volume. */
 UCLASS(ClassGroup = (Rendering, Common), HideCategories = (Object, Activation, "Components|Activation"), ShowCategories = (Mobility), EditInlineNew, meta = (BlueprintSpawnableComponent))
-class UBasicVolumeComponent : public UVoreealVolumeComponent
+class VOREEAL_API UBasicVolumeComponent : public UVoreealVolumeComponent
 {
 	GENERATED_BODY()
 
