@@ -32,7 +32,7 @@ bool FVoreealTest::RunTest(const FString& Parameters)
 				FVector CurrentPosition(x, y, z);
 				if (FVector::Dist(CurrentPosition, SphereCenter) <= SphereRadius)
 				{
-					Volume->SetVoxel(CurrentPosition, FColor::Red);
+					Volume->SetVoxel(CurrentPosition, 1, 255);
 				}
 			}
 		}

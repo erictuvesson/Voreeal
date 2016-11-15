@@ -1,5 +1,6 @@
 #pragma once
 
+#include <PolyVox/MaterialDensityPair.h>
 #include <PolyVox/RawVolume.h>
 
 #include "VoreealVolume.h"
@@ -25,7 +26,7 @@ struct FBasicVolumeSocket
 UCLASS(Blueprintable, meta = (DisplayThumbnail = "true"))
 class VOREEAL_API UBasicVolume 
 	: public UVoreealVolume
-	, public VoreealExtractHelper<PolyVox::RawVolume<uint32>, uint32>
+	, public VoreealExtractHelper<PolyVox::RawVolume<PolyVox::MaterialDensityPair88>, PolyVox::MaterialDensityPair88>
 {
 	GENERATED_BODY()
 
@@ -53,6 +54,7 @@ public:
 
 	// Begin UVoreealVolume Interface
 	virtual bool IsValid() const override;
+	virtual void GetVoxel(const FVector& Location, uint8& Material, uint8& Density) override;
 	virtual FVoreealMesh ExtractMesh(const FVoreealExtractorOptions& Options) override;
 	// End UVoreealVolume Interface
 
@@ -94,8 +96,7 @@ public:
 	void QuerySupportedSockets(TArray<FComponentSocketDescription>& OutSockets) const;
 
 protected:
-	virtual bool Internal_SetVoxel(const FVector& Location, const uint32& Data) override;
-	virtual void Internal_GetVoxel(const FVector& Location, uint32& Data) override;
+	virtual bool Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density) override;
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New) override;
 
 private:

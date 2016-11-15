@@ -223,7 +223,7 @@ bool FQubicleBinaryFileFormat::ReadFile(FArchive& Ar, UBasicVolume* Volume, FStr
 						uint8 g = (encodedData & 0x0000FF00) >> 8;
 						uint8 r = (encodedData & 0x000000FF);
 
-						Volume->SetVoxelXYZ(actualX, actualY, actualZ, FColor(r, g, b, a));
+						//Volume->SetVoxelXYZ(actualX, actualY, actualZ, FColor(r, g, b, a));
 					}
 				}
 			}
