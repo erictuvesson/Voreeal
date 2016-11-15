@@ -114,8 +114,8 @@ public:
 	/// Gets the octree region.
 	FVoreealRegion GetRegion() const;
 
-	/// Gets the max depth of the octree.
-	int32 GetMaxDepth() const;
+	/// Gets the max height of the octree.
+	int32 GetMaxHeight() const;
 
 	/// Gets the node count.
 	int32 GetCount() const;
@@ -125,14 +125,14 @@ public:
 	int32 Validate();
 
 	/// Treverse the nodes.
-	/// @result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
+	/// \result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
 	template <typename TCallback>
 	inline void Traverse(TCallback && Callback) {
 		Traverse(m_rootId, Callback);
 	}
 
 	/// Treverse the node.
-	/// @result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
+	/// \result return 'ETraverseOptions', parameter 'FSparseOctreeNode*'
 	template <typename TCallback>
 	void Traverse(int32 TargetNodeId, TCallback && Callback);
 
@@ -158,7 +158,7 @@ private:
 
 	// Octree
 	TArray<FSparseOctreeNode*> m_children;
-	int32 m_rootId, m_maxDepth;
+	int32 m_rootId, m_maxHeight, m_baseNodeSize;
 	FVoreealRegion m_bounds;
 	EOctreeConstructionModes m_constMode;
 };

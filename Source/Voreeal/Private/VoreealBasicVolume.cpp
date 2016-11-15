@@ -28,6 +28,26 @@ void UBasicVolume::Serialize(FArchive& Ar)
 	}
 
 	Ar << ImportedData;
+
+#if WITH_EDITORONLY_DATA
+	if (Ar.IsLoading() && (AssetImportData == nullptr))
+	{
+		// AssetImportData should always be valid
+		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+	}
+#endif
+}
+
+void UBasicVolume::PostInitProperties()
+{
+#if WITH_EDITORONLY_DATA
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
+	}
+#endif
+
+	Super::PostInitProperties();
 }
 
 void UBasicVolume::PostLoad()
@@ -40,38 +60,45 @@ void UBasicVolume::PostLoad()
 		DeserializeVolume(Ar);
 		OnChanged.Broadcast(GetEnclosingRegion());
 	}
-	else
-	{
-		// TODO: set default size from settings
-		Resize(FIntVector(64, 64, 64));
-	}
 }
 
-#if WITH_EDITORONLY_DATA
-void UBasicVolume::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const
+#if WITH_EDITOR
+void UBasicVolume::PreEditChange(UProperty* PropertyAboutToChange)
 {
-	Super::GetAssetRegistryTags(OutTags);
-	
-	//if (AssetImportData)
-	//{
-	//	OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
-	//}
+	Super::PreEditChange(PropertyAboutToChange);
 }
 
 void UBasicVolume::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
+
+bool UBasicVolume::CanEditChange(const UProperty* InProperty) const
+{
+	return Super::CanEditChange(InProperty);
+}
+#endif
+
+#if WITH_EDITORONLY_DATA
+void UBasicVolume::GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const
+{
+	Super::GetAssetRegistryTags(OutTags);
+	
+	if (AssetImportData)
+	{
+		OutTags.Add(FAssetRegistryTag(SourceFileTagName(), AssetImportData->GetSourceData().ToJson(), FAssetRegistryTag::TT_Hidden));
+	}
+}
 #endif
 
 bool UBasicVolume::IsValid() const
 {
-	return Volume != nullptr;
+	return Volume.IsValid();
 }
 
 FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 {
-	return ExtractMeshHelper(Volume.get(), ExtractorType, Options);
+	return ExtractMeshHelper(Volume.Get(), ExtractorType, Options);
 }
 
 bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
@@ -91,7 +118,8 @@ void UBasicVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
 {
 	if (New)
 	{
-		Volume.reset(nullptr);
+		Volume.Reset();
+		Volume = nullptr;
 	}
 	ResizeRegion(Region);
 }
@@ -112,14 +140,16 @@ void UBasicVolume::ResizeRegion(const FVoreealRegion& NewRegion)
 	{
 		VolumeType* newVolume = new VolumeType((PolyVox::Region)NewRegion);
 
-		PolyVox::VolumeResampler<VolumeType, VolumeType> volumeResampler(Volume.get(), Volume->getEnclosingRegion(), newVolume, newVolume->getEnclosingRegion());
+		PolyVox::VolumeResampler<VolumeType, VolumeType> volumeResampler(Volume.Get(), Volume->getEnclosingRegion(), newVolume, newVolume->getEnclosingRegion());
 		volumeResampler.execute();
 
-		Volume.reset(newVolume);
+		Volume.Reset();
+		Volume = MakeShareable(newVolume);
 	}
 	else
 	{
-		Volume.reset(new VolumeType((PolyVox::Region)NewRegion));
+		Volume.Reset();
+		Volume = MakeShareable(new VolumeType((PolyVox::Region)NewRegion));
 	}
 }
 

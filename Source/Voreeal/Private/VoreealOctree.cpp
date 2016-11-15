@@ -38,6 +38,8 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 	, m_volume(m_volume)
 	, m_volumeComponent(VolumeComponent)
 	, m_constMode(ConstMode)
+	, m_baseNodeSize(32)
+	, m_maxHeight(2)
 {
 	if (ConstMode == EOctreeConstructionModes::BoundVoxels)
 	{
@@ -61,7 +63,7 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 
 	int32 octreeTargetSize = ::PolyVox::upperPowerOfTwo(largestDimension);
 
-	m_maxDepth = ::PolyVox::logBase2((octreeTargetSize) / 2/*mBaseNodeSize*/) - 1;
+	m_maxHeight = ::PolyVox::logBase2((octreeTargetSize) / m_baseNodeSize) - 1;
 
 	int32 widthInc = octreeTargetSize - width;
 	int32 heightInc = octreeTargetSize - height;
@@ -122,9 +124,9 @@ FVoreealRegion FSparseOctree::GetRegion() const
 	return m_bounds;
 }
 
-int32 FSparseOctree::GetMaxDepth() const
+int32 FSparseOctree::GetMaxHeight() const
 {
-	return m_maxDepth;
+	return m_maxHeight;
 }
 
 int32 FSparseOctree::GetCount() const
@@ -187,8 +189,8 @@ void FSparseOctree::BuildNode(int32 parentId)
 		? ParentNodeSize.X
 		: ParentNodeSize.X + 1;
 
-	if (ParentSize > 32 /*mBaseNodeSize*/ &&
-		ParentNode->m_height < 2)
+	if (ParentSize > m_baseNodeSize&&
+		ParentNode->m_height < m_maxHeight)
 	{
 		int32 ChildSize = (m_constMode == EOctreeConstructionModes::BoundCells) 
 			? (ParentNodeSize.X) / 2

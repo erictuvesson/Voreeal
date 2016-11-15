@@ -170,9 +170,9 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			auto Index2 = mesh.getIndex(i + 1);
 			auto Index3 = mesh.getIndex(i + 2);
 
-			Result.Triangles.Add((int32)Index1);
-			Result.Triangles.Add((int32)Index2);
 			Result.Triangles.Add((int32)Index3);
+			Result.Triangles.Add((int32)Index2);
+			Result.Triangles.Add((int32)Index1);
 		}
 
 		break;

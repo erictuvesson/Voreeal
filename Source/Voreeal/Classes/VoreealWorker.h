@@ -2,6 +2,8 @@
 
 #include <mutex>
 
+// TODO: Is there any mutex lock there that can be changed?
+
 class FVoreealWorker : public FRunnable
 {
 	typedef TFunction<FVoreealMesh()>	TFunc;		   //< The input function
@@ -17,6 +19,8 @@ public:
 	virtual uint32 Run();
 	virtual void Stop();
 	// End FRunnable Interface
+
+	int32 GetRunningTaskCount() const;
 
 	// Ensure the thread is complete.
 	void EnsureCompletion();

@@ -39,10 +39,15 @@ public:
 
 	// Begin UObject Interface.
 	virtual void Serialize(FArchive& Ar) override;
+	virtual void PostInitProperties() override;
 	virtual void PostLoad() override;
+#if WITH_EDITOR
+	virtual void PreEditChange(UProperty* PropertyAboutToChange) override;
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual bool CanEditChange(const UProperty* InProperty) const override;
+#endif
 #if WITH_EDITORONLY_DATA
 	virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 	// End UObject Interface
 
@@ -65,9 +70,9 @@ public:
 
 public:
 #if WITH_EDITORONLY_DATA
-	//UPROPERTY(Category = ImportSettings, VisibleAnywhere, Instanced)
-	//class UAssetImportData* AssetImportData;
-	class USceneThumbnailInfo* ThumbnailInfo;
+	// Importing data and options used
+	UPROPERTY(Category = ImportSettings, VisibleAnywhere, Instanced)
+	class UAssetImportData* AssetImportData;
 #endif
 
 #if WITH_EDITOR
@@ -94,7 +99,7 @@ protected:
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New) override;
 
 private:
-	std::unique_ptr<VolumeType> Volume; // TODO: Switch to UE Ptr
+	TSharedPtr<VolumeType> Volume;
 
 	UPROPERTY()
 	TArray<uint8> ImportedData;

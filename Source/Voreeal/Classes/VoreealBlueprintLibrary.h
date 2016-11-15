@@ -47,6 +47,14 @@ public: // Region Methods
 	//static bool Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2);
 
 public:
+	// Gets how many tasks currently are running.
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|Task")
+	static int32 GetRunningTaskCount();
+
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|Task", meta = (WorldContext = "WorldContextObject"))
+	static void DrawDebugTaskText(UObject* WorldContextObject, const FColor& Color);
+
+public:
 
 	/// Draw Debug Region, 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Region|Debug", meta = (WorldContext = "WorldContextObject"))
