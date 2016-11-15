@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ProceduralMeshComponent.h>
+#include <PolyVox/MaterialDensityPair.h>
 
 #include "VoreealRegion.h"
 #include "VoreealVolume.generated.h"
@@ -85,18 +86,18 @@ public:
 public:
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const FColor& Color);
+	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, uint8 Material, uint8 Density);
 
 	// Set Voxel at Location.
-	void SetVoxel(const FIntVector& Location, const FColor& Color);
+	void SetVoxel(const FIntVector& Location, const uint8& Material, const uint8& Density);
 
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxel(const FVector& Location, const FColor& Color);
+	void SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density);
 	
 	// Get Voxel at Location.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
-	void GetVoxel(const FVector& Location, FColor& Color);
+	void GetVoxel(const FVector& Location, const uint8& Material, const uint8& Density);
 
 	// Checks if the volume is valid.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
@@ -110,8 +111,8 @@ public:
 	void DeserializeVolume(FArchive& Ar);
 
 protected:
-	virtual bool Internal_SetVoxel(const FVector& Location, const uint32& Data);
-	virtual void Internal_GetVoxel(const FVector& Location, uint32& Data);
+	virtual bool Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density);
+	virtual void Internal_GetVoxel(const FVector& Location, uint8& Material, uint8& Density);
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 };
 
