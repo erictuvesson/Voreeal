@@ -101,17 +101,19 @@ FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 	return ExtractMeshHelper(Volume.Get(), ExtractorType, Options);
 }
 
-bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint32& Data)
+bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	Volume->setVoxel(pos, Data);
+	Volume->setVoxel(pos, PolyVox::MaterialDensityPair88(Material, Density));
 	return true;
 }
 
-void UBasicVolume::Internal_GetVoxel(const FVector& Location, uint32& Data)
+void UBasicVolume::Internal_GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	Data = Volume->getVoxel(pos);
+	PolyVox::MaterialDensityPair88 Data = Volume->getVoxel(pos);
+	Material = Data.getMaterial();
+	Density = Data.getDensity();
 }
 
 void UBasicVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
