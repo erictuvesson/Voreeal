@@ -202,7 +202,7 @@ bool FMagicaVoxelFileFormat::ReadFile(FArchive& Ar, UBasicVolume* Volume, FStrin
 			rgba.r = (color >> 0) & 0xFF;
 		}
 
-		Volume->SetVoxelXYZ((int32)voxel.x, (int32)voxel.y, (int32)voxel.z, FColor(rgba.r, rgba.g, rgba.b, rgba.a));
+		Volume->SetVoxelXYZ((int32)voxel.x, (int32)voxel.y, (int32)voxel.z, 1, 255);
 	}
 
 	return true;

@@ -55,6 +55,12 @@ void FVoreealWorker::Stop()
 	StopTaskCounter.Increment();
 }
 
+int32 FVoreealWorker::GetRunningTaskCount() const
+{
+	// TODO: Thread-safe?
+	return Tasks.Num();
+}
+
 void FVoreealWorker::EnsureCompletion()
 {
 	Stop();

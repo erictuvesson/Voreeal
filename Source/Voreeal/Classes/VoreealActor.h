@@ -12,7 +12,11 @@ class VOREEAL_API AVoreealActor : public AActor
 
 public:
 	AVoreealActor(const class FObjectInitializer& ObjectInitializer);
-	
+
+	// Begin AActor Interface
+	virtual bool ShouldTickIfViewportsOnly() const override { return true; }
+	// End AActor Interface
+
 	/// Convert from world-space to volume-space
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
 	void WorldPositionToVolumePosition(const FVector& WorldPosition, FVector& Result) const;

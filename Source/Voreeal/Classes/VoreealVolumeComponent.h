@@ -27,4 +27,7 @@ private:
 
 	static FVoreealWorker* Runnable;
 	static void InitWorker();
+
+	// TODO: Fix
+	friend class UVoreealBlueprintLibrary;
 };
