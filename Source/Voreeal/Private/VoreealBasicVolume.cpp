@@ -96,6 +96,14 @@ bool UBasicVolume::IsValid() const
 	return Volume.IsValid();
 }
 
+void UBasicVolume::GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
+{
+	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
+	PolyVox::MaterialDensityPair88 Data = Volume->getVoxel(pos);
+	Material = Data.getMaterial();
+	Density = Data.getDensity();
+}
+
 FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 {
 	return ExtractMeshHelper(Volume.Get(), ExtractorType, Options);
@@ -106,14 +114,6 @@ bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint8& Mater
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
 	Volume->setVoxel(pos, PolyVox::MaterialDensityPair88(Material, Density));
 	return true;
-}
-
-void UBasicVolume::Internal_GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
-{
-	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	PolyVox::MaterialDensityPair88 Data = Volume->getVoxel(pos);
-	Material = Data.getMaterial();
-	Density = Data.getDensity();
 }
 
 void UBasicVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
@@ -142,8 +142,8 @@ void UBasicVolume::ResizeRegion(const FVoreealRegion& NewRegion)
 	{
 		VolumeType* newVolume = new VolumeType((PolyVox::Region)NewRegion);
 
-		PolyVox::VolumeResampler<VolumeType, VolumeType> volumeResampler(Volume.Get(), Volume->getEnclosingRegion(), newVolume, newVolume->getEnclosingRegion());
-		volumeResampler.execute();
+		//PolyVox::VolumeResampler<VolumeType, VolumeType> volumeResampler(Volume.Get(), Volume->getEnclosingRegion(), newVolume, newVolume->getEnclosingRegion());
+		//volumeResampler.execute();
 
 		Volume.Reset();
 		Volume = MakeShareable(newVolume);

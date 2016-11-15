@@ -23,6 +23,9 @@ public:
 	// Begin UObject Interface
 	virtual void PostLoad() override;
 	virtual FString GetDetailedInfoInternal() const override;
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 	// End UObject Interface
 
 	// Begin UActorComponent Interface
@@ -34,6 +37,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
 	void DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness);
+
+	// Marks the volume for full redraw.
+	UFUNCTION(BlueprintCallable, Category = "Voreeal")
+	void MarkVolumeDirty();
 
 private:
 	void EnsureRendering();

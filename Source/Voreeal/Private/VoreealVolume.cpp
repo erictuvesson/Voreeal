@@ -21,24 +21,9 @@ FVoreealExtractorOptions FVoreealMesh::GetOptions() const
 	return Options;
 }
 
-void UVoreealVolume::SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const uint8& Material, const uint8& Density)
-{
-	SetVoxel(FVector(X, Y, Z), Material, Density);
-}
-
-void UVoreealVolume::SetVoxel(const FIntVector& Location, const uint8& Material, const uint8& Density)
-{
-	SetVoxel(FVector(Location.X, Location.Y, Location.Z), Material, Density);
-}
-
 void UVoreealVolume::SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
 {
 	Internal_SetVoxel(Location, Material, Density);
-}
-
-void UVoreealVolume::GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
-{
-	Internal_GetVoxel(Location, Material, Density);
 }
 
 bool UVoreealVolume::IsValid() const
@@ -59,11 +44,6 @@ bool UVoreealVolume::Internal_SetVoxel(const FVector& Location, const uint8& Mat
 	return false;
 }
 
-void UVoreealVolume::Internal_GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
-{
-	check(0 && "abstract");
-}
-
 void UVoreealVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
 {
 	check(0 && "abstract");
@@ -82,7 +62,7 @@ void UVoreealVolume::SerializeVolume(FArchive& Ar, FVoreealRegion& Region)
 		{
 			for (int32 z = Region.Z; z < (Region.Z + Region.Depth); z++)
 			{
-				Internal_GetVoxel(FVector(x, y, z), Material, Density);
+				GetVoxel(FVector(x, y, z), Material, Density);
 				Ar << Material << Density;
 			}
 		}

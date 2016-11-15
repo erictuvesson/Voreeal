@@ -8,7 +8,9 @@ UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& Obj
 	: Super(ObjectInitializer)
 	, m_octree(nullptr)
 {
+	PrimaryComponentTick.bTickEvenWhenPaused = true;
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 
 	Volume = ObjectInitializer.CreateDefaultSubobject<UBasicVolume>(this, TEXT("NewVolume"));
 	check(Volume);
@@ -31,6 +33,13 @@ void UBasicVolumeComponent::PostLoad()
 		Volume->ConditionalPostLoad();
 		EnsureRendering();
 	}
+}
+
+void UBasicVolumeComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	// MarkVolumeDirty();
 }
 
 FString UBasicVolumeComponent::GetDetailedInfoInternal() const
@@ -88,7 +97,7 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 
 bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 {
-	if (NewVolume == Volume)
+	if (NewVolume == Volume && NewVolume == nullptr)
 		return false;
 
 	AActor* Owner = GetOwner();
@@ -131,6 +140,15 @@ void UBasicVolumeComponent::DrawDebugOctree(const FLinearColor& Color, float Dur
 
 			return ETraverseOptions::Skip;
 		});
+	}
+}
+
+void UBasicVolumeComponent::MarkVolumeDirty()
+{
+	// Rebuild mesh
+	if (m_octree)
+	{
+		m_octree->MarkChange(Volume->GetEnclosingRegion(), FTimespan(0, 0, FPlatformTime::Seconds()));
 	}
 }
 

@@ -54,6 +54,7 @@ public:
 
 	// Begin UVoreealVolume Interface
 	virtual bool IsValid() const override;
+	virtual void GetVoxel(const FVector& Location, uint8& Material, uint8& Density) override;
 	virtual FVoreealMesh ExtractMesh(const FVoreealExtractorOptions& Options) override;
 	// End UVoreealVolume Interface
 
@@ -96,7 +97,6 @@ public:
 
 protected:
 	virtual bool Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density) override;
-	virtual void Internal_GetVoxel(const FVector& Location, uint8& Material, uint8& Density) override;
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New) override;
 
 private:
