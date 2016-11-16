@@ -6,14 +6,16 @@
 void FBasicVolumeEditorCommands::RegisterCommands()
 {
 	// Show toggles
-	UI_COMMAND(SetShowGrid, "Grid", "Displays the viewport grid.", EUserInterfaceActionType::ToggleButton, FInputChord());
-
 	UI_COMMAND(SetShowSockets, "Sockets", "Displays the volume sockets.", EUserInterfaceActionType::ToggleButton, FInputChord());
-
 	UI_COMMAND(SetShowPivot, "Pivot", "Display the pivot location of the volume.", EUserInterfaceActionType::ToggleButton, FInputChord());
+
+	UI_COMMAND(SetShowGrid, "Grid", "Displays the viewport grid.", EUserInterfaceActionType::ToggleButton, FInputChord());
+	UI_COMMAND(SetShowBounds, "Bounds", "Displays the volume bounds.", EUserInterfaceActionType::ToggleButton, FInputChord());
+	UI_COMMAND(SetShowOctree, "Octree", "Displays the volume's octree.", EUserInterfaceActionType::ToggleButton, FInputChord());
 
 	// Editing modes
 	UI_COMMAND(EnterViewMode, "View", "View the volume.", EUserInterfaceActionType::ToggleButton, FInputChord());
+	UI_COMMAND(EnterEditMode, "Edit", "Edit the volume.", EUserInterfaceActionType::ToggleButton, FInputChord());
 }
 
 #undef LOCTEXT_NAMESPACE

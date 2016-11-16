@@ -21,6 +21,7 @@ UBasicVolumeComponent::~UBasicVolumeComponent()
 	if (m_octree != nullptr)
 	{
 		delete m_octree;
+		m_octree = nullptr;
 	}
 }
 
@@ -109,6 +110,12 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 		return false;
 	}
 
+	if (m_octree)
+	{
+		delete m_octree;
+		m_octree = nullptr;
+	}
+
 	Volume = NewVolume;
 
 	// If there were a volume before we call then we force gc
@@ -119,7 +126,6 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 	}
 
 	EnsureRendering();
-	// TODO: Mark dirty
 
 	return true;
 }

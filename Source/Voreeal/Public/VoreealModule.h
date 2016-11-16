@@ -15,5 +15,3 @@ public:
 		return FModuleManager::Get().IsModuleLoaded("Voreeal");
 	}
 };
-
-DECLARE_LOG_CATEGORY_EXTERN(LogVoreeal, Log, All);

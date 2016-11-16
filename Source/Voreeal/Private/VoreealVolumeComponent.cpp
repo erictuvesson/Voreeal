@@ -40,27 +40,28 @@ void UVoreealVolumeComponent::AddTask(UVoreealVolume* Volume, const FVoreealExtr
 {
 	if (Volume == nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Task: Volume is null."));
-		return; // Volume is null
+		UE_LOG(LogVoreeal, Warning, TEXT("Task: Volume is null.  (This should never happen!)"));
+		return;
 	}
 
 	if (Options.Region.Width <= 0 ||
 		Options.Region.Height <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Task: Region is to small."));
-		return; // Region is to small
+		UE_LOG(LogVoreeal, Warning, TEXT("Task: Region is to small. (This should never happen!)"));
+		return;
 	}
 
 	if (Runnable && Identifier != -1)
 	{
 		Runnable->AddTask(Identifier, [Volume, Options]() -> FVoreealMesh
 		{
+			// TODO: Ensure that all tasks are done before deleting volume
 			return Volume->ExtractMesh(Options);
 		});
 	}
 	else
 	{
-		// TODO: Log error
+		UE_LOG(LogVoreeal, Warning, TEXT("Task: Runnable? (This should never happen!)"));
 	}
 }
 

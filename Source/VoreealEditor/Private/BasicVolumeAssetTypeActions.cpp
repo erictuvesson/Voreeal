@@ -21,7 +21,7 @@ FText FBasicVolumeAssetTypeActions::GetName() const
 
 FColor FBasicVolumeAssetTypeActions::GetTypeColor() const
 {
-	return FColor::Cyan;
+	return FColor(69, 190, 91);
 }
 
 UClass* FBasicVolumeAssetTypeActions::GetSupportedClass() const

@@ -93,63 +93,30 @@ void SBasicVolumeEditorViewport::BindCommands()
 
 	TSharedRef<FBasicVolumeEditorViewportClient> EditorViewportClientRef = EditorViewportClient.ToSharedRef();
 
-	//// Show toggles
-	//CommandList->MapAction(
-	//	Commands.SetShowGrid,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FEditorViewportClient::SetShowGrid),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FEditorViewportClient::IsSetShowGridChecked));
+	// Show toggles
+	CommandList->MapAction(
+		Commands.SetShowGrid,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FEditorViewportClient::SetShowGrid),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FEditorViewportClient::IsSetShowGridChecked));
 
-	//CommandList->MapAction(
-	//	Commands.SetShowSourceTexture,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowSourceTexture),
-	//	FCanExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::CanShowSourceTexture),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowSourceTextureChecked));
+	CommandList->MapAction(
+		Commands.SetShowBounds,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FEditorViewportClient::ToggleShowBounds),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FEditorViewportClient::IsSetShowBoundsChecked));
 
-	//CommandList->MapAction(
-	//	Commands.ExtractSprites,
-	//	FExecuteAction::CreateSP(this, &SBasicVolumeEditorViewport::ShowExtractSpritesDialog),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked(),
-	//	FIsActionButtonVisible::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInSourceRegionEditMode));
+	CommandList->MapAction(
+		Commands.SetShowOctree,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowOctree),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsSetShowOctreeChecked));
 
-	//CommandList->MapAction(
-	//	Commands.ToggleShowRelatedSprites,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowRelatedSprites),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowRelatedSpritesChecked),
-	//	FIsActionButtonVisible::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInSourceRegionEditMode));
-
-	//CommandList->MapAction(
-	//	Commands.ToggleShowSpriteNames,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowSpriteNames),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowSpriteNamesChecked),
-	//	FIsActionButtonVisible::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInSourceRegionEditMode));
-
-	//CommandList->MapAction(
-	//	Commands.SetShowBounds,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FEditorViewportClient::ToggleShowBounds),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FEditorViewportClient::IsSetShowBoundsChecked));
-
-	//CommandList->MapAction(
-	//	Commands.SetShowCollision,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FEditorViewportClient::SetShowCollision),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FEditorViewportClient::IsSetShowCollisionChecked));
-
-	//CommandList->MapAction(
-	//	Commands.SetShowMeshEdges,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowMeshEdges),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowMeshEdgesChecked));
-
-	//CommandList->MapAction(
-	//	Commands.SetShowSockets,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowSockets),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowSocketsChecked));
+	CommandList->MapAction(
+		Commands.SetShowSockets,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::ToggleShowSockets),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowSocketsChecked));
 
 	//CommandList->MapAction(
 	//	Commands.SetShowPivot,
@@ -157,27 +124,18 @@ void SBasicVolumeEditorViewport::BindCommands()
 	//	FCanExecuteAction(),
 	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsShowPivotChecked));
 
-	//// Editing modes
-	//CommandList->MapAction(
-	//	Commands.EnterViewMode,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterViewMode),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInViewMode));
-	//CommandList->MapAction(
-	//	Commands.EnterSourceRegionEditMode,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterSourceRegionEditMode),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInSourceRegionEditMode));
-	//CommandList->MapAction(
-	//	Commands.EnterCollisionEditMode,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterCollisionEditMode),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInCollisionEditMode));
-	//CommandList->MapAction(
-	//	Commands.EnterRenderingEditMode,
-	//	FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterRenderingEditMode),
-	//	FCanExecuteAction(),
-	//	FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInRenderingEditMode));
+	// Editing modes
+	CommandList->MapAction(
+		Commands.EnterViewMode,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterViewMode),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInViewMode));
+
+	CommandList->MapAction(
+		Commands.EnterEditMode,
+		FExecuteAction::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::EnterEditMode),
+		FCanExecuteAction(),
+		FIsActionChecked::CreateSP(EditorViewportClientRef, &FBasicVolumeEditorViewportClient::IsInEditMode));
 }
 
 TSharedRef<FEditorViewportClient> SBasicVolumeEditorViewport::MakeEditorViewportClient()
@@ -298,7 +256,7 @@ TSharedRef<SDockTab> FBasicVolumeEditor::SpawnTab_Details(const FSpawnTabArgs& A
 
 void FBasicVolumeEditor::RegisterTabSpawners(const TSharedRef<class FTabManager>& pTabManager)
 {
-	WorkspaceMenuCategory = pTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_SpriteEditor", "Sprite Editor"));
+	WorkspaceMenuCategory = pTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_SpriteEditor", "Voxel Volume Editor"));
 	auto WorkspaceMenuCategoryRef = WorkspaceMenuCategory.ToSharedRef();
 
 	FAssetEditorToolkit::RegisterTabSpawners(pTabManager);
@@ -423,7 +381,8 @@ FString FBasicVolumeEditor::GetWorldCentricTabPrefix() const
 
 FString FBasicVolumeEditor::GetDocumentationLink() const
 {
-	return TEXT("Engine/Voreeal/BasicVolumeEditor");
+	// TODO: 
+	return TEXT("Voreeal/BasicVolumeEditor");
 }
 
 void FBasicVolumeEditor::OnToolkitHostingStarted(const TSharedRef<class IToolkit>& Toolkit)
@@ -444,7 +403,7 @@ void FBasicVolumeEditor::OnToolkitHostingFinished(const TSharedRef<class IToolki
 
 FLinearColor FBasicVolumeEditor::GetWorldCentricTabColorScale() const
 {
-	return FLinearColor::Red;
+	return FLinearColor::Black;
 }
 
 void FBasicVolumeEditor::AddReferencedObjects(FReferenceCollector& Collector)
@@ -504,8 +463,7 @@ void FBasicVolumeEditor::ExtendToolbar()
 
 void FBasicVolumeEditor::SetVolumeBeingEdited(UBasicVolume* NewVolume)
 {
-	if ((NewVolume != VolumeBeingEdited) && 
-		(NewVolume != nullptr))
+	if ((NewVolume != VolumeBeingEdited) && (NewVolume != nullptr))
 	{
 		UBasicVolume* OldVolume = VolumeBeingEdited;
 		VolumeBeingEdited = NewVolume;
@@ -533,26 +491,19 @@ void FBasicVolumeEditor::CreateModeToolbarWidgets(FToolBarBuilder& IgnoredBuilde
 {
 	FToolBarBuilder ToolbarBuilder(ViewportPtr->GetCommandList(), FMultiBoxCustomization::None);
 	ToolbarBuilder.AddToolBarButton(FBasicVolumeEditorCommands::Get().EnterViewMode);
-	//ToolbarBuilder.AddToolBarButton(FBasicVolumeEditorCommands::Get().EnterSourceRegionEditMode);
-	//ToolbarBuilder.AddToolBarButton(FBasicVolumeEditorCommands::Get().EnterCollisionEditMode);
-	//ToolbarBuilder.AddToolBarButton(FBasicVolumeEditorCommands::Get().EnterRenderingEditMode);
+	ToolbarBuilder.AddToolBarButton(FBasicVolumeEditorCommands::Get().EnterEditMode);
 	AddToolbarWidget(ToolbarBuilder.MakeWidget());
 }
 
 FText FBasicVolumeEditor::GetCurrentModeCornerText() const
 {
-	//switch (GetCurrentMode())
-	//{
-	////case ESpriteEditorMode::EditCollisionMode:
-	////	return LOCTEXT("EditCollisionGeometry_CornerText", "Edit Collision");
-	////case ESpriteEditorMode::EditRenderingGeomMode:
-	////	return LOCTEXT("EditRenderGeometry_CornerText", "Edit Render Geometry");
-	////case ESpriteEditorMode::EditSourceRegionMode:
-	////	return LOCTEXT("EditSourceRegion_CornerText", "Edit Source Region");
-	//default:
-	//	return FText::GetEmpty();
-	//}
-	return FText::GetEmpty();
+	switch (GetCurrentMode())
+	{
+	case EBasicVolumeEditorMode::EditMode:
+		return LOCTEXT("EditMode_CornerText", "Edit Volume");
+	default:
+		return FText::GetEmpty();
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

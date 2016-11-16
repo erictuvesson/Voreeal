@@ -38,6 +38,7 @@ FBasicVolumeEditorViewportClient::FBasicVolumeEditorViewportClient(TWeakPtr<FBas
 	bManipulationDirtiedSomething = false;
 	ScopedTransaction = nullptr;
 
+	bShowOctree = false;
 	bShowSockets = true;
 	bShowPivot = true;
 
@@ -59,6 +60,67 @@ FBasicVolumeEditorViewportClient::FBasicVolumeEditorViewportClient(TWeakPtr<FBas
 void FBasicVolumeEditorViewportClient::ActivateEditMode()
 {
 	ModeTools->SetWidgetMode(FWidget::WM_Translate);
+}
+
+#pragma region // Begin Show Flags
+void FBasicVolumeEditorViewportClient::SetShowOctree(bool bShow)
+{
+	bShowOctree = !bShowOctree;
+	Invalidate(); 
+}
+
+void FBasicVolumeEditorViewportClient::ToggleShowOctree()
+{
+	bShowOctree = !bShowOctree;
+	Invalidate();
+}
+
+bool FBasicVolumeEditorViewportClient::IsSetShowOctreeChecked() const
+{
+	return bShowOctree;
+}
+
+void FBasicVolumeEditorViewportClient::ToggleShowSockets()
+{
+	bShowSockets = !bShowSockets;
+	Invalidate();
+}
+
+bool FBasicVolumeEditorViewportClient::IsShowSocketsChecked() const
+{ 
+	return bShowSockets; 
+}
+
+void FBasicVolumeEditorViewportClient::ToggleShowPivot()
+{ 
+	bShowPivot = !bShowPivot; 
+	Invalidate(); 
+}
+
+bool FBasicVolumeEditorViewportClient::IsShowPivotChecked() const
+{ 
+	return bShowPivot; 
+}
+#pragma endregion
+
+void FBasicVolumeEditorViewportClient::EnterViewMode()
+{ 
+	InternalActivateNewMode(EBasicVolumeEditorMode::ViewMode); 
+}
+
+void FBasicVolumeEditorViewportClient::EnterEditMode()
+{ 
+	InternalActivateNewMode(EBasicVolumeEditorMode::EditMode); 
+}
+
+bool FBasicVolumeEditorViewportClient::IsInViewMode() const
+{ 
+	return CurrentMode == EBasicVolumeEditorMode::ViewMode; 
+}
+
+bool FBasicVolumeEditorViewportClient::IsInEditMode() const
+{ 
+	return CurrentMode == EBasicVolumeEditorMode::EditMode; 
 }
 
 void FBasicVolumeEditorViewportClient::DrawCanvas(FViewport& pViewport, FSceneView& View, FCanvas& Canvas)
@@ -129,6 +191,11 @@ void FBasicVolumeEditorViewportClient::Tick(float DeltaSeconds)
 	}
 
 	FVoreealEditorViewportClient::Tick(DeltaSeconds);
+
+	if (bShowOctree && RenderVolumeComponent)
+	{
+		RenderVolumeComponent->DrawDebugOctree(FLinearColor::Red, 0, 1.0f);
+	}
 
 	if (!GIntraFrameDebuggingGameThread)
 	{

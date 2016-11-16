@@ -18,3 +18,5 @@
 // PolyVox Classes
 #include <PolyVox/CubicSurfaceExtractor.h>
 #include <PolyVox/MarchingCubesSurfaceExtractor.h>
+
+DECLARE_LOG_CATEGORY_EXTERN(LogVoreeal, Log, All);

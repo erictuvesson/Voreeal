@@ -43,12 +43,10 @@ void FVoreealStyle::Initialize()
 	StyleSet->SetContentRoot(FPaths::EngineContentDir() / TEXT("Editor/Slate"));
 	StyleSet->SetCoreContentRoot(FPaths::EngineContentDir() / TEXT("Slate"));
 
-	// Asset actions
+	// Basic Volume Editor
 	{
-		//StyleSet->Set("AssetActions.CreateSprite", new IMAGE_PLUGIN_BRUSH(TEXT("Icons/icon_Texture_CreateSprite_16x"), Icon16x16));
-		//StyleSet->Set("AssetActions.ExtractSprites", new IMAGE_PLUGIN_BRUSH(TEXT("Icons/icon_Texture_ExtractSprites_16x"), Icon16x16));
-		//StyleSet->Set("AssetActions.ConfigureForRetroSprites", new IMAGE_PLUGIN_BRUSH(TEXT("Icons/icon_Texture_ConfigureForRetroSprites_16x"), Icon16x16));
-		//StyleSet->Set("AssetActions.CreateTileSet", new IMAGE_PLUGIN_BRUSH(TEXT("Icons/icon_Texture_CreateTileSet_16x"), Icon16x16));
+		StyleSet->Set("BasicVolumeEditor.EnterViewMode", new IMAGE_PLUGIN_BRUSH("Icons/icon_Voreeal_ViewVolume_40x", Icon40x40));
+		StyleSet->Set("BasicVolumeEditor.EnterEditMode", new IMAGE_PLUGIN_BRUSH("Icons/icon_Voreeal_EditVolume_40x", Icon40x40));
 	}
 
 	FSlateStyleRegistry::RegisterSlateStyle(*StyleSet.Get());

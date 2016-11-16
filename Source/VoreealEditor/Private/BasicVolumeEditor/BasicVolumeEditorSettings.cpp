@@ -4,4 +4,5 @@
 UBasicVolumeEditorSettings::UBasicVolumeEditorSettings()
 	: bShowGridByDefault(false)
 {
+
 }

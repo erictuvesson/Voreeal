@@ -26,7 +26,7 @@ TSharedRef<SWidget> SBasicVolumeEditorViewportToolbar::GenerateShowMenu() const
 		ShowMenuBuilder.AddMenuSeparator();
 
 		ShowMenuBuilder.AddMenuEntry(FBasicVolumeEditorCommands::Get().SetShowGrid);
-		//ShowMenuBuilder.AddMenuEntry(FSpriteEditorCommands::Get().SetShowBounds);
+		ShowMenuBuilder.AddMenuEntry(FBasicVolumeEditorCommands::Get().SetShowBounds);
 	}
 
 	return ShowMenuBuilder.MakeWidget();

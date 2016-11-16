@@ -32,17 +32,41 @@ public:
 	virtual FLinearColor GetBackgroundColor() const override;
 	// End FEditorViewportClient Interface
 
+	// Activate the edit mode.
 	void ActivateEditMode();
 
-	void ToggleShowSockets() { bShowSockets = !bShowSockets; Invalidate(); }
-	bool IsShowSocketsChecked() const { return bShowSockets; }
+	// Sets the show octree flag.
+	void SetShowOctree(bool bShow);
 
-	void ToggleShowPivot() { bShowPivot = !bShowPivot; Invalidate(); }
-	bool IsShowPivotChecked() const { return bShowPivot; }
+	// Callback for toggling the octree show flag.
+	void ToggleShowOctree();
 
-	void EnterViewMode() { InternalActivateNewMode(EBasicVolumeEditorMode::ViewMode); }
+	// Callback for checking the octree show flag.
+	bool IsSetShowOctreeChecked() const;
 
-	bool IsInViewMode() const { return CurrentMode == EBasicVolumeEditorMode::ViewMode; }
+	// Callback for toggling the sockets show flag.
+	void ToggleShowSockets();
+
+	// Callback for checking the sockets show flag.
+	bool IsShowSocketsChecked() const;
+
+	// Callback for toggling the privot show flag.
+	void ToggleShowPivot();
+
+	// Callback for checking the privot show flag.
+	bool IsShowPivotChecked() const;
+
+	// Enter the view mode.
+	void EnterViewMode();
+
+	// Enter the edit mode.
+	void EnterEditMode();
+
+	// Callback for checking if the editor is in view mode.
+	bool IsInViewMode() const;
+
+	// Callback for checking if the editor is in edit mode.
+	bool IsInEditMode() const;
 
 	// Invalidate any references to the volume being edited; it has changed
 	void NotifyVolumeBeingEditedHasChanged();
@@ -79,11 +103,9 @@ private:
 	// The current transaction for undo/redo
 	class FScopedTransaction* ScopedTransaction;
 
-	// Should we show sockets?
-	bool bShowSockets;
-
-	// Should we show the sprite pivot?
-	bool bShowPivot;
+	uint8 bShowOctree : 1;
+	uint8 bShowSockets : 1;
+	uint8 bShowPivot : 1;
 
 private:
 	UBasicVolume* GetVolumeBeingEdited() const { return EditorPtr.Pin()->GetVolumeBeingEdited(); }

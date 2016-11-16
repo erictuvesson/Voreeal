@@ -19,8 +19,12 @@
 // Voreeal Editor Support
 #include "VoreealStyle.h"
 #include "BasicVolumeAssetTypeActions.h"
+#include "VoreealBasicVolumeThumbnailRenderer.h"
 #include "BasicVolumeEditor/BasicVolumeDetailsCustomization.h"
 #include "BasicVolumeEditor/BasicVolumeComponentDetailsCustomization.h"
+
+#include "VoreealRuntimeSettings.h"
+#include "VoreealEditorSettings.h"
 
 DEFINE_LOG_CATEGORY(LogVoreealEditor);
 
@@ -80,7 +84,7 @@ public:
 		}
 
 		// Register the thumbnail renderers
-		//UThumbnailManager::Get().RegisterCustomRenderer(UBasicVolume::StaticClass(), UPaperSpriteThumbnailRenderer::StaticClass());
+		UThumbnailManager::Get().RegisterCustomRenderer(UBasicVolume::StaticClass(), UBasicVolumeThumbnailRenderer::StaticClass());
 
 		RegisterSettings();
 	}
@@ -124,15 +128,15 @@ private:
 	{
 		if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 		{
-			/*SettingsModule->RegisterSettings("Project", "Plugins", "Voreeal",
+			SettingsModule->RegisterSettings("Project", "Plugins", "Voreeal",
 				LOCTEXT("RuntimeSettingsName", "Voreeal"),
 				LOCTEXT("RuntimeSettingsDescription", "Configure the Voreeal plugin"),
-				GetMutableDefault<UPaperRuntimeSettings>());
+				GetMutableDefault<UVoreealRuntimeSettings>());
 
-			SettingsModule->RegisterSettings("Editor", "ContentEditors", "BasicVolumeEditor",
-				LOCTEXT("BasicVolumeEditorSettingsName", "Basic Volume Editor"),
-				LOCTEXT("BasicVolumeEditorSettingsDescription", "Configure the look and feel of the Basic Volume Editor."),
-				GetMutableDefault<USpriteEditorSettings>());*/
+			SettingsModule->RegisterSettings("Editor", "ContentEditors", "VoreealEditor",
+				LOCTEXT("BasicVolumeEditorSettingsName", "Voreeal Editor"),
+				LOCTEXT("BasicVolumeEditorSettingsDescription", "Configure the look and feel of Voreeal's Editors."),
+				GetMutableDefault<UVoreealEditorSettings>());
 
 			//SettingsModule->RegisterSettings("Project", "Editor", "Paper2DImport",
 			//	LOCTEXT("PaperImporterSettingsName", "Paper2D - Import"),
@@ -145,9 +149,8 @@ private:
 	{
 		if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 		{
-			//SettingsModule->UnregisterSettings("Project", "Editor", "Paper2DImport");
-			//SettingsModule->UnregisterSettings("Editor", "ContentEditors", "BasicVolumeEditor");
-			//SettingsModule->UnregisterSettings("Project", "Plugins", "Voreeal");
+			SettingsModule->UnregisterSettings("Project", "Editor", "Voreeal");
+			SettingsModule->UnregisterSettings("Editor", "ContentEditors", "VoreealEditor");
 		}
 	}
 };

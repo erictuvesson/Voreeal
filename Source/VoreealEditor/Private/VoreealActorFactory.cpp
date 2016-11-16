@@ -2,6 +2,7 @@
 #include "VoreealActorFactory.h"
 
 #include "VoreealBasicVolumeActor.h"
+#include "VoreealEditorSettings.h"
 
 #define LOCTEXT_NAMESPACE "Voreeal"
 
@@ -20,6 +21,9 @@ void UVoreealActorFactory::PostSpawnActor(UObject* Asset, AActor* NewActor)
 	{
 		auto* TypedActor = CastChecked<ABasicVolumeActor>(NewActor);
 		TypedActor->GetBasicVolumeComponent()->SetBasicVolume(VoxelVolume);
+
+		const UVoreealEditorSettings* VoreealSettings = GetDefault<UVoreealEditorSettings>();
+		TypedActor->SetActorScale3D(VoreealSettings->DefaultScale);
 	}
 }
 

@@ -22,10 +22,14 @@ public:
 
 public:
 	// Show toggles
-	TSharedPtr<FUICommandInfo> SetShowGrid;
 	TSharedPtr<FUICommandInfo> SetShowSockets;
 	TSharedPtr<FUICommandInfo> SetShowPivot;
 
+	TSharedPtr<FUICommandInfo> SetShowGrid;
+	TSharedPtr<FUICommandInfo> SetShowBounds;
+	TSharedPtr<FUICommandInfo> SetShowOctree;
+
 	// Editing modes
 	TSharedPtr<FUICommandInfo> EnterViewMode;
+	TSharedPtr<FUICommandInfo> EnterEditMode;
 };
