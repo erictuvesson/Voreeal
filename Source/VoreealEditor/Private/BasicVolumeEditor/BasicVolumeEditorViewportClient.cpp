@@ -186,12 +186,12 @@ void FBasicVolumeEditorViewportClient::Tick(float DeltaSeconds)
 {
 	if (UBasicVolume* Volume = GetVolumeBeingEdited())
 	{
-		//@TODO: Doesn't need to happen every frame, only when properties are updated
 
 	}
 
 	FVoreealEditorViewportClient::Tick(DeltaSeconds);
 
+	// Draw the octree
 	if (bShowOctree && RenderVolumeComponent)
 	{
 		RenderVolumeComponent->DrawDebugOctree(FLinearColor::Red, 0, 1.0f);
@@ -281,7 +281,6 @@ bool FBasicVolumeEditorViewportClient::InputKey(FViewport* pViewport, int32 Cont
 
 void FBasicVolumeEditorViewportClient::TrackingStarted(const struct FInputEventState& InInputState, bool bIsDragging, bool bNudge)
 {
-	//@TODO: Should push this into FEditorViewportClient
 	// Begin transacting.  Give the current editor mode an opportunity to do the transacting.
 	const bool bTrackingHandledExternally = ModeTools->StartTracking(this, Viewport);
 
@@ -305,7 +304,7 @@ void FBasicVolumeEditorViewportClient::TrackingStopped()
 
 FLinearColor FBasicVolumeEditorViewportClient::GetBackgroundColor() const
 {
-	return FLinearColor();
+	return FLinearColor::Black;
 }
 
 void FBasicVolumeEditorViewportClient::NotifyVolumeBeingEditedHasChanged()

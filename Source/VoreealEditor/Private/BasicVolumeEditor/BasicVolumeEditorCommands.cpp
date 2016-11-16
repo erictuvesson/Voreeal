@@ -3,6 +3,17 @@
 
 #define LOCTEXT_NAMESPACE "VoreealEditor"
 
+FBasicVolumeEditorCommands::FBasicVolumeEditorCommands()
+	: TCommands<FBasicVolumeEditorCommands>(
+		TEXT("BasicVolumeEditor"), // Context name for fast lookup
+		NSLOCTEXT("Contexts", "BasicVolumeEditor", "Basic Volume Editor"), // Localized context name for displaying
+		NAME_None, // Parent
+		FVoreealStyle::Get()->GetStyleSetName() // Icon Style Set
+		)
+{
+
+}
+
 void FBasicVolumeEditorCommands::RegisterCommands()
 {
 	// Show toggles

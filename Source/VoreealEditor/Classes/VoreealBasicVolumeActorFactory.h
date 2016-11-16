@@ -1,14 +1,14 @@
 #pragma once
 
-#include "VoreealActorFactory.generated.h"
+#include "VoreealBasicVolumeActorFactory.generated.h"
 
 UCLASS()
-class UVoreealActorFactory : public UActorFactory
+class UVoreealBasicVolumeActorFactory : public UActorFactory
 {
 	GENERATED_BODY()
 		
 public:
-	UVoreealActorFactory(const class FObjectInitializer& ObjectInitializer);
+	UVoreealBasicVolumeActorFactory(const class FObjectInitializer& ObjectInitializer);
 
 	// Begin UActorFactory Interface
 	virtual void PostSpawnActor(UObject* Asset, AActor* NewActor) override;

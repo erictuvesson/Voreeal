@@ -1,16 +1,15 @@
 #pragma once
 
 #include "UnrealEd.h"
-#include "VoreealFactory.generated.h"
+#include "VoreealBasicVolumeFactory.generated.h"
 
-/// Factory for Voreeal Volume.
 UCLASS()
-class UVoreealFactory : public UFactory
+class UVoreealBasicVolumeFactory : public UFactory
 {
 	GENERATED_BODY()
 
 public:
-	UVoreealFactory(const class FObjectInitializer& ObjectInitializer);
+	UVoreealBasicVolumeFactory(const class FObjectInitializer& ObjectInitializer);
 
 	// UFactory interface
 	virtual UObject* FactoryCreateNew(UClass* Class, UObject* InParent, FName Name, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;

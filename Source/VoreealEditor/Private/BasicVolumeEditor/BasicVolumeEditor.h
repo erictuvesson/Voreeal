@@ -5,6 +5,7 @@
 
 class SBasicVolumeEditorViewport;
 
+// Editor Modes
 enum class EBasicVolumeEditorMode
 {
 	ViewMode,
@@ -35,13 +36,17 @@ public:
 	virtual void AddReferencedObjects(FReferenceCollector& Collector) override;
 	// End FSerializableObject Interface
 
-public:
-	void InitEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, class UBasicVolume* InitVolume);
-
+	// Gets the current editor mode.
 	EBasicVolumeEditorMode GetCurrentMode() const;
 
+	// Gets the volume we are editing.
 	UBasicVolume* GetVolumeBeingEdited() const;
+
+	// Set the volume we are editing. 
 	void SetVolumeBeingEdited(UBasicVolume* NewVolume);
+
+public:
+	void InitEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, class UBasicVolume* InitVolume);
 
 protected:
 	UBasicVolume* VolumeBeingEdited;

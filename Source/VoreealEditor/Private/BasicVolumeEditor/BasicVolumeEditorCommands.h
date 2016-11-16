@@ -5,16 +5,7 @@
 class FBasicVolumeEditorCommands : public TCommands<FBasicVolumeEditorCommands>
 {
 public:
-	FBasicVolumeEditorCommands()
-		: TCommands<FBasicVolumeEditorCommands>(
-			TEXT("BasicVolumeEditor"), // Context name for fast lookup
-			NSLOCTEXT("Contexts", "BasicVolumeEditor", "Basic Volume Editor"), // Localized context name for displaying
-			NAME_None, // Parent
-			FVoreealStyle::Get()->GetStyleSetName() // Icon Style Set
-			)
-	{
-
-	}
+	FBasicVolumeEditorCommands();
 
 	// Begin TCommand<> Interface
 	virtual void RegisterCommands() override;
