@@ -220,40 +220,6 @@ public:
 	// End SSingleObjectDetailsPanel Interface
 };
 
-TSharedRef<SDockTab> FBasicVolumeEditor::SpawnTab_Viewport(const FSpawnTabArgs& Args)
-{
-	return SNew(SDockTab)
-		.Label(LOCTEXT("ViewportTab_Title", "Viewport"))
-		[
-			SNew(SOverlay)
-			+ SOverlay::Slot() //< The editor viewport
-			[
-				ViewportPtr.ToSharedRef()
-			]
-			// Bottom-right corner text indicating the preview nature of the sprite editor
-			+ SOverlay::Slot()
-			.Padding(10)
-			.VAlign(VAlign_Bottom)
-			.HAlign(HAlign_Right)
-			[
-				SNew(STextBlock)
-				.Visibility(EVisibility::HitTestInvisible)
-				.TextStyle(FEditorStyle::Get(), "Graph.CornerText")
-				.Text(this, &FBasicVolumeEditor::GetCurrentModeCornerText)
-			]
-		];
-}
-
-TSharedRef<SDockTab> FBasicVolumeEditor::SpawnTab_Details(const FSpawnTabArgs& Args)
-{
-	TSharedPtr<FBasicVolumeEditor> EditorPtr = SharedThis(this);
-	return SNew(SDockTab)
-		.Label(LOCTEXT("DetailsTab_Title", "Details"))
-		[
-			SNew(SBasicVolumePropertiesTabBody, EditorPtr)
-		];
-}
-
 void FBasicVolumeEditor::RegisterTabSpawners(const TSharedRef<class FTabManager>& pTabManager)
 {
 	WorkspaceMenuCategory = pTabManager->AddLocalWorkspaceMenuCategory(LOCTEXT("WorkspaceMenu_SpriteEditor", "Voxel Volume Editor"));
@@ -278,75 +244,6 @@ void FBasicVolumeEditor::UnregisterTabSpawners(const TSharedRef<class FTabManage
 
 	pTabManager->UnregisterTabSpawner(FBasicVolumeEditorTabs::ViewportID);
 	pTabManager->UnregisterTabSpawner(FBasicVolumeEditorTabs::DetailsID);
-}
-
-void FBasicVolumeEditor::InitEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, class UBasicVolume* InitVolume)
-{
-	VolumeBeingEdited = InitVolume;
-
-	FBasicVolumeEditorCommands::Register();
-
-	BindCommands();
-
-	TSharedPtr<FBasicVolumeEditor> EditorPtr = SharedThis(this);
-	ViewportPtr = SNew(SBasicVolumeEditorViewport, EditorPtr);
-
-	// Default layout
-	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_BasicVolumeEditor_Layout_v6")
-		->AddArea
-		(
-			FTabManager::NewPrimaryArea()
-			->SetOrientation(Orient_Vertical)
-			->Split
-			(
-				FTabManager::NewStack()
-				->SetSizeCoefficient(0.1f)
-				->SetHideTabWell(true)
-				->AddTab(GetToolbarTabId(), ETabState::OpenedTab)
-			)
-			->Split
-			(
-				FTabManager::NewSplitter()
-				->SetOrientation(Orient_Horizontal)
-				->SetSizeCoefficient(0.9f)
-				->Split
-				(
-					FTabManager::NewStack()
-					->SetSizeCoefficient(0.8f)
-					->SetHideTabWell(true)
-					->AddTab(FBasicVolumeEditorTabs::ViewportID, ETabState::OpenedTab)
-				)
-				->Split
-				(
-					FTabManager::NewSplitter()
-					->SetOrientation(Orient_Vertical)
-					->SetSizeCoefficient(0.2f)
-					->Split
-					(
-						FTabManager::NewStack()
-						->SetSizeCoefficient(0.75f)
-						->SetHideTabWell(true)
-						->AddTab(FBasicVolumeEditorTabs::DetailsID, ETabState::OpenedTab)
-					)
-				)
-			)
-		);
-
-	// Initialize the asset editor
-	InitAssetEditor(Mode, InitToolkitHost, BasicVolumeEditorAppName, StandaloneDefaultLayout, 
-		/*bCreateDefaultStandaloneMenu=*/ true, /*bCreateDefaultToolbar=*/ true, InitVolume);
-
-	ViewportPtr->ActivateEditMode();
-
-	// Extend things
-	ExtendMenu();
-	ExtendToolbar();
-	RegenerateMenusAndToolbars();
-}
-
-void FBasicVolumeEditor::BindCommands()
-{
-
 }
 
 FName FBasicVolumeEditor::GetToolkitFName() const
@@ -406,9 +303,108 @@ FLinearColor FBasicVolumeEditor::GetWorldCentricTabColorScale() const
 	return FLinearColor::Black;
 }
 
+
 void FBasicVolumeEditor::AddReferencedObjects(FReferenceCollector& Collector)
 {
 	Collector.AddReferencedObject(VolumeBeingEdited);
+}
+
+
+EBasicVolumeEditorMode FBasicVolumeEditor::GetCurrentMode() const
+{
+	return ViewportPtr->GetCurrentMode();
+}
+
+UBasicVolume* FBasicVolumeEditor::GetVolumeBeingEdited() const
+{
+	return VolumeBeingEdited;
+}
+
+void FBasicVolumeEditor::SetVolumeBeingEdited(UBasicVolume* NewVolume)
+{
+	if ((NewVolume != VolumeBeingEdited) && (NewVolume != nullptr))
+	{
+		UBasicVolume* OldVolume = VolumeBeingEdited;
+		VolumeBeingEdited = NewVolume;
+
+		// Let the viewport know that we are editing something different
+		ViewportPtr->NotifyVolumeBeingEditedHasChanged();
+
+		// Let the editor know that are editing something different
+		RemoveEditingObject(OldVolume);
+		AddEditingObject(NewVolume);
+	}
+}
+
+
+void FBasicVolumeEditor::InitEditor(const EToolkitMode::Type Mode, const TSharedPtr<class IToolkitHost>& InitToolkitHost, class UBasicVolume* InitVolume)
+{
+	VolumeBeingEdited = InitVolume;
+
+	FBasicVolumeEditorCommands::Register();
+
+	BindCommands();
+
+	TSharedPtr<FBasicVolumeEditor> EditorPtr = SharedThis(this);
+	ViewportPtr = SNew(SBasicVolumeEditorViewport, EditorPtr);
+
+	// Default layout
+	const TSharedRef<FTabManager::FLayout> StandaloneDefaultLayout = FTabManager::NewLayout("Standalone_BasicVolumeEditor_Layout_v6")
+		->AddArea
+		(
+			FTabManager::NewPrimaryArea()
+			->SetOrientation(Orient_Vertical)
+			->Split
+			(
+				FTabManager::NewStack()
+				->SetSizeCoefficient(0.1f)
+				->SetHideTabWell(true)
+				->AddTab(GetToolbarTabId(), ETabState::OpenedTab)
+			)
+			->Split
+			(
+				FTabManager::NewSplitter()
+				->SetOrientation(Orient_Horizontal)
+				->SetSizeCoefficient(0.9f)
+				->Split
+				(
+					FTabManager::NewStack()
+					->SetSizeCoefficient(0.8f)
+					->SetHideTabWell(true)
+					->AddTab(FBasicVolumeEditorTabs::ViewportID, ETabState::OpenedTab)
+				)
+				->Split
+				(
+					FTabManager::NewSplitter()
+					->SetOrientation(Orient_Vertical)
+					->SetSizeCoefficient(0.2f)
+					->Split
+					(
+						FTabManager::NewStack()
+						->SetSizeCoefficient(0.75f)
+						->SetHideTabWell(true)
+						->AddTab(FBasicVolumeEditorTabs::DetailsID, ETabState::OpenedTab)
+					)
+				)
+			)
+		);
+
+	// Initialize the asset editor
+	InitAssetEditor(Mode, InitToolkitHost, BasicVolumeEditorAppName, StandaloneDefaultLayout,
+		/*bCreateDefaultStandaloneMenu=*/ true, /*bCreateDefaultToolbar=*/ true, InitVolume);
+
+	ViewportPtr->ActivateEditMode();
+
+	// Extend things
+	ExtendMenu();
+	ExtendToolbar();
+	RegenerateMenusAndToolbars();
+}
+
+
+void FBasicVolumeEditor::BindCommands()
+{
+
 }
 
 void FBasicVolumeEditor::ExtendMenu()
@@ -461,30 +457,38 @@ void FBasicVolumeEditor::ExtendToolbar()
 	//AddToolbarExtender(EditorModule->GetSpriteEditorToolBarExtensibilityManager()->GetAllExtenders());
 }
 
-void FBasicVolumeEditor::SetVolumeBeingEdited(UBasicVolume* NewVolume)
+TSharedRef<SDockTab> FBasicVolumeEditor::SpawnTab_Viewport(const FSpawnTabArgs& Args)
 {
-	if ((NewVolume != VolumeBeingEdited) && (NewVolume != nullptr))
-	{
-		UBasicVolume* OldVolume = VolumeBeingEdited;
-		VolumeBeingEdited = NewVolume;
-
-		// Let the viewport know that we are editing something different
-		ViewportPtr->NotifyVolumeBeingEditedHasChanged();
-
-		// Let the editor know that are editing something different
-		RemoveEditingObject(OldVolume);
-		AddEditingObject(NewVolume);
-	}
+	return SNew(SDockTab)
+		.Label(LOCTEXT("ViewportTab_Title", "Viewport"))
+		[
+			SNew(SOverlay)
+			+ SOverlay::Slot() //< The editor viewport
+		[
+			ViewportPtr.ToSharedRef()
+		]
+	// Bottom-right corner text indicating the preview nature of the sprite editor
+	+ SOverlay::Slot()
+		.Padding(10)
+		.VAlign(VAlign_Bottom)
+		.HAlign(HAlign_Right)
+		[
+			SNew(STextBlock)
+			.Visibility(EVisibility::HitTestInvisible)
+		.TextStyle(FEditorStyle::Get(), "Graph.CornerText")
+		.Text(this, &FBasicVolumeEditor::GetCurrentModeCornerText)
+		]
+		];
 }
 
-EBasicVolumeEditorMode FBasicVolumeEditor::GetCurrentMode() const
+TSharedRef<SDockTab> FBasicVolumeEditor::SpawnTab_Details(const FSpawnTabArgs& Args)
 {
-	return ViewportPtr->GetCurrentMode();
-}
-
-UBasicVolume* FBasicVolumeEditor::GetVolumeBeingEdited() const
-{
-	return VolumeBeingEdited;
+	TSharedPtr<FBasicVolumeEditor> EditorPtr = SharedThis(this);
+	return SNew(SDockTab)
+		.Label(LOCTEXT("DetailsTab_Title", "Details"))
+		[
+			SNew(SBasicVolumePropertiesTabBody, EditorPtr)
+		];
 }
 
 void FBasicVolumeEditor::CreateModeToolbarWidgets(FToolBarBuilder& IgnoredBuilder)

@@ -62,5 +62,6 @@ protected:
 
 	void CreateModeToolbarWidgets(FToolBarBuilder& ToolbarBuilder);
 
+	// Gets the corner text for the current mode.
 	FText GetCurrentModeCornerText() const;
 };
