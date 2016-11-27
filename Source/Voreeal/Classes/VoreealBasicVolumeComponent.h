@@ -12,8 +12,8 @@ class VOREEAL_API UBasicVolumeComponent : public UVoreealVolumeComponent
 	GENERATED_BODY()
 
 public:
-	/// Voxel Volume Asset
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
+	// Voxel Volume Asset
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
 	UBasicVolume* Volume;
 
 public:

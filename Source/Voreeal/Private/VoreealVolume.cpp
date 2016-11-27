@@ -21,7 +21,7 @@ FVoreealExtractorOptions FVoreealMesh::GetOptions() const
 	return Options;
 }
 
-void UVoreealVolume::SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
+void UVoreealVolume::SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
 {
 	// Allow suppress then re-enable
 	//OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
@@ -41,7 +41,7 @@ FVoreealMesh UVoreealVolume::ExtractMesh(const FVoreealExtractorOptions& Options
 	return FVoreealMesh(Options);
 }
 
-bool UVoreealVolume::Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
+bool UVoreealVolume::Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
 {
 	check(0 && "abstract");
 	return false;

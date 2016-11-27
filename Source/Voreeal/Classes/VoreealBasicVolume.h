@@ -96,7 +96,7 @@ public:
 	void QuerySupportedSockets(TArray<FComponentSocketDescription>& OutSockets) const;
 
 protected:
-	virtual bool Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density) override;
+	virtual bool Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density) override;
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New) override;
 
 private:

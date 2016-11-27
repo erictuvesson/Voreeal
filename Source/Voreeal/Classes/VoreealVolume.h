@@ -26,18 +26,18 @@ public:
 public:
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxelXYZ(const int32& X, const int32& Y, const int32& Z, const uint8& Material, const uint8& Density) {
+	void SetVoxelXYZ(int32 X, int32 Y, int32 Z, const uint8& Material, const uint8& Density) {
 		SetVoxel(FVector(X, Y, Z), Material, Density);
 	}
 
 	// Set Voxel at Location.
-	void SetVoxel(const FIntVector& Location, const uint8& Material, const uint8& Density) {
+	void SetVoxel(FIntVector Location, const uint8& Material, const uint8& Density) {
 		SetVoxel(FVector(Location.X, Location.Y, Location.Z), Material, Density);
 	}
 
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density);
+	void SetVoxel(FVector Location, const uint8& Material, const uint8& Density);
 	
 	// Get Voxel at Location.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
@@ -55,6 +55,6 @@ public:
 	void DeserializeVolume(FArchive& Ar);
 
 protected:
-	virtual bool Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density);
+	virtual bool Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density);
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 };

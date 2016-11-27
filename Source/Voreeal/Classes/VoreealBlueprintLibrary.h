@@ -10,12 +10,11 @@ class VOREEAL_API UVoreealBlueprintLibrary : public UBlueprintFunctionLibrary
 
 public: // Region Methods
 
-	/*/// Gets the center of the region.
+	// Gets the center of the region.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal|Region")
-	static void GetCenter(const FVoreealRegion& Region, FVector& Result) {
-		Result = Region.GetCenter();
-	}
+	static FVector GetCenter(const FVoreealRegion& Region) { return Region.GetCenter(); }
 
+	/*
 	/// Gets the upper corner of the region.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal|Region")
 	static void GetUpperCorner(const FVoreealRegion& Region, FVector& Result) {

@@ -213,9 +213,9 @@ FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const F
 {
 	FVector Lower = Region1.GetLower();
 	FVector Upper = Region1.GetUpper();
-	if (Vector.X > Lower.X || Vector.X < Upper.X ||
-		Vector.Y > Lower.Y || Vector.Y < Upper.Y ||
-		Vector.Z > Lower.Z || Vector.Z < Upper.Z)
+	if (Vector.X < Lower.X || Vector.X > (Upper.X - 1) ||
+		Vector.Y < Lower.Y || Vector.Y > (Upper.Y - 1) ||
+		Vector.Z < Lower.Z || Vector.Z > (Upper.Z - 1))
 	{
 		return false;
 	}
