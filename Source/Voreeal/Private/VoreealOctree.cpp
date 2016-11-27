@@ -15,6 +15,7 @@ FSparseOctreeNode::FSparseOctreeNode(FVoreealRegion region, int32 parentId, FSpa
 	, m_dataLastModified(0)
 	, m_lastSceduledForUpdate(0)
 	, m_meshLastChanged(0)
+	, m_bTaskRunning(false)
 {
 	for (int32 i = 0; i < ChildrenCount; i++)
 	{

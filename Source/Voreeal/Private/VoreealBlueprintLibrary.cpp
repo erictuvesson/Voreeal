@@ -14,14 +14,14 @@ int32 UVoreealBlueprintLibrary::GetRunningTaskCount()
 	return 0;
 }
 
-void UVoreealBlueprintLibrary::DrawDebugTaskText(UObject* WorldContextObject, const FColor& Color)
+void UVoreealBlueprintLibrary::DrawDebugTaskText(UObject* WorldContextObject, int32 Key, const FColor& Color)
 {
 	int32 TasksCount = GetRunningTaskCount();
 
-	GEngine->AddOnScreenDebugMessage(0, 5.0, Color, FString::Printf(TEXT("Tasks Running: %d"), TasksCount));
+	GEngine->AddOnScreenDebugMessage(Key, 5.0, Color, FString::Printf(TEXT("Tasks Running: %d"), TasksCount));
 }
 
-void UVoreealBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform, 
+void UVoreealBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform,
 	const FVoreealRegion& Region, const FLinearColor& LinearColor, float Duration, float Thickness)
 {
 	UWorld* World = WorldContextObject->GetWorld();

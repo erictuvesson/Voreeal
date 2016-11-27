@@ -96,6 +96,9 @@ struct VOREEAL_API FVoreealRegion
 	// Does this region contain another region.
 	static bool Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2);
 
+	// Does this region contain a vector.
+	static bool Contains(const FVoreealRegion& Region1, const FVector& Vector);
+
 	// Does this region intersect another region.
 	static bool Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2);
 
@@ -204,6 +207,19 @@ FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const F
 		&& (Region1.Y < (Region2.Y + Region2.Height))
 		&& (Region2.Z < (Region1.Z + Region1.Depth))
 		&& (Region1.Z < (Region2.Z + Region2.Depth));
+}
+
+FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const FVector& Vector)
+{
+	FVector Lower = Region1.GetLower();
+	FVector Upper = Region1.GetUpper();
+	if (Vector.X > Lower.X || Vector.X < Upper.X ||
+		Vector.Y > Lower.Y || Vector.Y < Upper.Y ||
+		Vector.Z > Lower.Z || Vector.Z < Upper.Z)
+	{
+		return false;
+	}
+	return true;
 }
 
 FORCEINLINE bool FVoreealRegion::Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2)

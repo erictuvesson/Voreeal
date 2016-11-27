@@ -110,7 +110,7 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			// Normals are not supported by CubicSurface Extractor, so this should probably be removed.
 
 			Result.Vertices.Add(RegionLower + VertexPosition);
-			Result.Normals.Add(VertexNormal);
+			//Result.Normals.Add(VertexNormal);
 
 			//FColor Color;
 			//Color.R = (vertex.data & 0x000000FF);
@@ -130,6 +130,16 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			Result.Triangles.Add((int32)Index3);
 			Result.Triangles.Add((int32)Index2);
 			Result.Triangles.Add((int32)Index1);
+
+			// Make Normal
+			auto Vertex1 = Result.Vertices[Index3];
+			auto Vertex2 = Result.Vertices[Index2];
+			auto Vertex3 = Result.Vertices[Index1];
+
+			FVector Direction = FVector::CrossProduct(Vertex2 - Vertex1, Vertex3 - Vertex1);
+			Direction.Normalize();
+
+			Result.Normals.Add(Direction);
 		}
 
 		break;

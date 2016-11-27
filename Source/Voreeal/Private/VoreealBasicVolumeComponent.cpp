@@ -13,7 +13,8 @@ UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& Obj
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 
 	Volume = ObjectInitializer.CreateDefaultSubobject<UBasicVolume>(this, TEXT("NewVolume"));
-	check(Volume);
+
+	EnsureRendering();
 }
 
 UBasicVolumeComponent::~UBasicVolumeComponent()
@@ -66,10 +67,12 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 			if (!node->IsUpToDate() && !node->IsSceduled() && !node->IsTaskRunning())
 			{
 				node->m_lastSceduledForUpdate = FTimespan(0, 0, FPlatformTime::Seconds());
+				node->m_bTaskRunning = true;
 
 				FVoreealExtractorOptions Options(node->m_selfId, node->m_bounds, 0);
 
 				AddTask(Volume, Options);
+
 
 				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
 			}
@@ -89,11 +92,20 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 
 				FSparseOctreeNode* Node = m_octree->GetNodeAt(Mesh->GetOptions().Identifier);
 				Node->m_meshLastChanged = FTimespan(0, 0, FPlatformTime::Seconds());
+				Node->m_bTaskRunning = false;
 
 				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Finish Task!"));
 			}
 		}
 	}
+}
+
+void UBasicVolumeComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// TODO: Bind somewhere else??
+	Volume->OnChanged.AddDynamic(this, &UBasicVolumeComponent::OnVolumeChanged);
 }
 
 bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
@@ -156,6 +168,11 @@ void UBasicVolumeComponent::MarkVolumeDirty()
 	{
 		m_octree->MarkChange(Volume->GetEnclosingRegion(), FTimespan(0, 0, FPlatformTime::Seconds()));
 	}
+}
+
+void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
+{
+	m_octree->MarkChange(Region, FTimespan(0, 0, FPlatformTime::Seconds()));
 }
 
 void UBasicVolumeComponent::EnsureRendering()

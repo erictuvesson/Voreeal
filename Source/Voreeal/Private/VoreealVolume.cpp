@@ -23,6 +23,9 @@ FVoreealExtractorOptions FVoreealMesh::GetOptions() const
 
 void UVoreealVolume::SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
 {
+	// Allow suppress then re-enable
+	//OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
+
 	Internal_SetVoxel(Location, Material, Density);
 }
 

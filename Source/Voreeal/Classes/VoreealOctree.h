@@ -63,6 +63,8 @@ struct FSparseOctreeNode
 	FTimespan m_lastSceduledForUpdate;
 	FTimespan m_meshLastChanged;
 
+	uint32 m_bTaskRunning : 1;
+
 	/// Constructor
 	FSparseOctreeNode(FVoreealRegion Region, int32 ParentId, FSparseOctree* Root);
 
@@ -82,7 +84,7 @@ struct FSparseOctreeNode
 	/// Gets if extraction mesh generation task is running.
 	FORCEINLINE bool IsTaskRunning() const
 	{
-		return false;
+		return m_bTaskRunning;
 	}
 };
 

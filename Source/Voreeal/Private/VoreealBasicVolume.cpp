@@ -111,8 +111,17 @@ FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 
 bool UBasicVolume::Internal_SetVoxel(const FVector& Location, const uint8& Material, const uint8& Density)
 {
+	// TODO: Important
+	/*if (!FVoreealRegion::Contains(GetEnclosingRegion(), Location))
+	{
+		return false;
+	}*/
+
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
 	Volume->setVoxel(pos, PolyVox::MaterialDensityPair88(Material, Density));
+
+	OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
+
 	return true;
 }
 

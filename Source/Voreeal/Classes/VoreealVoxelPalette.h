@@ -3,15 +3,21 @@
 #include "VoreealVoxelPalette.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVoxelPaletteData : public FTableRowBase
+struct FVoxelData
+{
+	GENERATED_BODY();
+
+	FColor Color;
+	
+};
+
+UCLASS(Blueprintable)
+class VOREEAL_API UVoxelPalette : public UObject
 {
 	GENERATED_BODY()
 
-	FVoxelPaletteData()
-		: Color(FColor::Gray)
-	{ }
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Voreeal|Palette")
+	TMap<uint8, FVoxelData> Palette;
 
-	// The vertex color of the voxel.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal|Palette")
-	FColor Color;
 };

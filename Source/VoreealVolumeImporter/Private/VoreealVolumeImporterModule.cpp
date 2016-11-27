@@ -1,17 +1,26 @@
 #include "VoreealVolumeImporterPrivatePCH.h"
+#include "VoreealImporterModule.h"
 
-class FVoreealVolumeImporterModule : public FDefaultModuleImpl
+#include "Formats/MagicaVoxelImporter.h"
+//#include "Formats/QubicleBinaryImporter.h"
+
+
+void FVoreealImporterModule::StartupModule()
 {
-public:
-    virtual void StartupModule() override
-    {
-    }
+	RegisterImporter(new FMagicaVoxelImporter());
+	//RegisterImporter(new QubicleBinaryImporter);
+}
 
-    virtual void ShutdownModule() override
-    {
-    }
-};
+void FVoreealImporterModule::ShutdownModule()
+{
+	// TODO: Delete registered importers
+}
 
-IMPLEMENT_MODULE(FVoreealVolumeImporterModule, VoreealImporter);
+void FVoreealImporterModule::RegisterImporter(FVoreealImporter* Importer)
+{
+	Importers.Add(Importer);
+}
 
-DEFINE_LOG_CATEGORY(LogVoreealVolumeImporter);
+IMPLEMENT_MODULE(FVoreealImporterModule, VoreealImporter);
+
+DEFINE_LOG_CATEGORY(LogVoreealImporter);

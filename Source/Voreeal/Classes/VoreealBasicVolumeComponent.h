@@ -30,6 +30,7 @@ public:
 
 	// Begin UActorComponent Interface
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+	virtual void BeginPlay() override;
 	// End UActorComponent Interface
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Voreeal")
@@ -37,12 +38,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
 	void DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness);
-
+	
 	// Marks the volume for full redraw.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void MarkVolumeDirty();
 
 private:
+	UFUNCTION()
+	void OnVolumeChanged(FVoreealRegion Region);
+
 	void EnsureRendering();
 
 private:

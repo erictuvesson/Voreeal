@@ -2,4 +2,6 @@
 
 #include "UnrealEd.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogVoreealVolumeImporter, Verbose, All);
+#include "VoreealBasicVolume.h"
+
+DECLARE_LOG_CATEGORY_EXTERN(LogVoreealImporter, Verbose, All);

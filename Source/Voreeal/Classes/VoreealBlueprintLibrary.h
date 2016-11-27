@@ -52,7 +52,7 @@ public:
 	static int32 GetRunningTaskCount();
 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Task", meta = (WorldContext = "WorldContextObject"))
-	static void DrawDebugTaskText(UObject* WorldContextObject, const FColor& Color);
+	static void DrawDebugTaskText(UObject* WorldContextObject, int32 Key, const FColor& Color);
 
 public:
 
