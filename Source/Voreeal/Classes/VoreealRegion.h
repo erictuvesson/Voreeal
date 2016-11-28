@@ -4,6 +4,18 @@
 
 #include "VoreealRegion.generated.h"
 
+// Defines how the bounding volumes intersects or contain one another.
+UENUM(Blueprintable)
+enum class EContainmentType : uint8
+{
+	// Indicates that there is no overlap between two bounding volumes.
+	Disjoint,
+	// Indicates that one bounding volume completely contains another volume.
+	Contains,
+	// Indicates that bounding volumes partially overlap one another.
+	Intersects
+};
+
 /// Defines a region within a volume.
 USTRUCT(BlueprintType)
 struct VOREEAL_API FVoreealRegion
@@ -94,7 +106,7 @@ struct VOREEAL_API FVoreealRegion
 	void ShiftLowerCorner(int32 X, int32 Y, int32 Z);
 
 	// Does this region contain another region.
-	static bool Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2);
+	static EContainmentType Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2);
 
 	// Does this region contain a vector.
 	static bool Contains(const FVoreealRegion& Region1, const FVector& Vector);
@@ -199,14 +211,28 @@ FORCEINLINE void FVoreealRegion::ShiftLowerCorner(int32 pX, int32 pY, int32 pZ)
 	Depth += pZ;
 }
 
-FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
+FORCEINLINE EContainmentType FVoreealRegion::Contains(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
 {
-	return (Region2.X < (Region1.X + Region1.Width))
-		&& (Region1.X < (Region2.X + Region2.Width))
-		&& (Region2.Y < (Region1.Y + Region1.Height))
-		&& (Region1.Y < (Region2.Y + Region2.Height))
-		&& (Region2.Z < (Region1.Z + Region1.Depth))
-		&& (Region1.Z < (Region2.Z + Region2.Depth));
+	FVector Lower1 = Region1.GetLower();
+	FVector Upper1 = Region1.GetUpper();
+	FVector Lower2 = Region2.GetLower();
+	FVector Upper2 = Region2.GetUpper();
+
+	if (Upper2.X < Lower1.X || Lower2.X > Upper1.X ||
+		Upper2.Y < Lower1.Y || Lower2.Y > Upper1.Y ||
+		Upper2.Z < Lower1.Z || Lower2.Z > Upper1.Z)
+	{
+		return EContainmentType::Disjoint;
+	}
+
+	if (Lower2.X >= Lower1.X && Upper2.X <= Upper1.X &&
+		Lower2.Y >= Lower1.Y && Upper2.Y <= Upper1.Y &&
+		Lower2.Z >= Lower1.Z && Upper2.Z <= Upper1.Z)
+	{
+		return EContainmentType::Contains;
+	}
+
+	return EContainmentType::Intersects;
 }
 
 FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const FVector& Vector)
@@ -224,11 +250,5 @@ FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const F
 
 FORCEINLINE bool FVoreealRegion::Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
 {
-	// TODO: Intersect
-	return (Region2.X < (Region1.X + Region1.Width))
-		&& (Region1.X < (Region2.X + Region2.Width))
-		&& (Region2.Y < (Region1.Y + Region1.Height))
-		&& (Region1.Y < (Region2.Y + Region2.Height))
-		&& (Region2.Z < (Region1.Z + Region1.Depth))
-		&& (Region1.Z < (Region2.Z + Region2.Depth));
+	return Contains(Region1, Region2) == EContainmentType::Intersects;
 }

@@ -4,6 +4,7 @@
 #include <PolyVox/VolumeResampler.h>
 
 #include "VoreealRegion.h"
+#include "VoreealOctree.h"
 #include "VoreealExtractHelper.generated.h"
 
 UENUM(BlueprintType)
@@ -18,8 +19,14 @@ enum class EVolumeExtractor : uint8
 // Extractor Options
 struct VOREEAL_API FVoreealExtractorOptions
 {
-	// Used to identify for example which node it was in a octree.
+	// A pointer to the owning octree.
+	TWeakPtr<FSparseOctree> Octree;
+
+	// identify for example which node it was in a octree.
 	int32 Identifier;
+
+	// identifier for paged volume.
+	FIntVector PagedIdentifier;
 
 	// The region to extract.
 	FVoreealRegion Region;
@@ -27,8 +34,9 @@ struct VOREEAL_API FVoreealExtractorOptions
 	// The level of detail we are extracting.
 	int32 LOD;
 
-	FVoreealExtractorOptions(int32 Identifier, FVoreealRegion Region, int32 LOD)
-		: Identifier(Identifier)
+	FVoreealExtractorOptions(TWeakPtr<FSparseOctree> Octree, int32 Identifier, FVoreealRegion Region, int32 LOD)
+		: Octree(Octree)
+		, Identifier(Identifier)
 		, Region(Region)
 		, LOD(LOD)
 	{

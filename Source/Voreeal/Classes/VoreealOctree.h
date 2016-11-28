@@ -138,6 +138,12 @@ public:
 	template <typename TCallback>
 	void Traverse(int32 TargetNodeId, TCallback && Callback);
 
+	/// Mark a change now at the position.
+	void MarkChangeNow(const FIntVector& Position);
+
+	/// Mark a change now in the region.
+	void MarkChangeNow(const FVoreealRegion& Region);
+
 	/// Mark a change at the position.
 	void MarkChange(const FIntVector& Position, const FTimespan& ChangeTime);
 

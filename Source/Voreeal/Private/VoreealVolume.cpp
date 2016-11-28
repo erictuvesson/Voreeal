@@ -49,7 +49,7 @@ bool UVoreealVolume::Internal_SetVoxel(FVector Location, const uint8& Material, 
 
 void UVoreealVolume::Internal_SetSize(const FVoreealRegion& Region, bool New)
 {
-	check(0 && "abstract");
+	// Might not be supported
 }
 
 void UVoreealVolume::SerializeVolume(FArchive& Ar, FVoreealRegion& Region)

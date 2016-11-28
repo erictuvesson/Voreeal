@@ -13,12 +13,11 @@ class VOREEAL_API UBasicVolumeComponent : public UVoreealVolumeComponent
 
 public:
 	// Voxel Volume Asset
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
 	UBasicVolume* Volume;
 
 public:
 	UBasicVolumeComponent(const class FObjectInitializer& ObjectInitializer);
-	virtual ~UBasicVolumeComponent();
 
 	// Begin UObject Interface
 	virtual void PostLoad() override;
@@ -50,5 +49,5 @@ private:
 	void EnsureRendering();
 
 private:
-	FSparseOctree* m_octree;
+	TSharedPtr<FSparseOctree> m_octree;
 };

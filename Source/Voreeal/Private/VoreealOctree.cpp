@@ -154,6 +154,16 @@ int32 FSparseOctree::Validate()
 	return Count;
 }
 
+void FSparseOctree::MarkChangeNow(const FIntVector& Position)
+{
+	MarkChange(Position, FTimespan(0, 0, FPlatformTime::Seconds()));
+}
+
+void FSparseOctree::MarkChangeNow(const FVoreealRegion& Region)
+{
+	MarkChange(Region, FTimespan(0, 0, FPlatformTime::Seconds()));
+}
+
 void FSparseOctree::MarkChange(const FIntVector& position, const FTimespan& changeTime)
 {
 	MarkChange(m_rootId, FVoreealRegion(position.X, position.Y, position.Z, 1, 1, 1), changeTime);

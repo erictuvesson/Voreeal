@@ -17,15 +17,6 @@ UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& Obj
 	EnsureRendering();
 }
 
-UBasicVolumeComponent::~UBasicVolumeComponent()
-{
-	if (m_octree != nullptr)
-	{
-		delete m_octree;
-		m_octree = nullptr;
-	}
-}
-
 void UBasicVolumeComponent::PostLoad()
 {
 	Super::PostLoad();
@@ -53,7 +44,7 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (m_octree)
+	if (m_octree.IsValid())
 	{
 		// Traverse all the nodes and see if they need to be updated,
 		// if so we queue a task.
@@ -69,7 +60,7 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 				node->m_lastSceduledForUpdate = FTimespan(0, 0, FPlatformTime::Seconds());
 				node->m_bTaskRunning = true;
 
-				FVoreealExtractorOptions Options(node->m_selfId, node->m_bounds, 0);
+				FVoreealExtractorOptions Options(TWeakPtr<FSparseOctree>(m_octree), node->m_selfId, node->m_bounds, 0);
 
 				AddTask(Volume, Options);
 
@@ -122,10 +113,9 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 		return false;
 	}
 
-	if (m_octree)
+	if (m_octree.IsValid())
 	{
-		delete m_octree;
-		m_octree = nullptr;
+		m_octree.Reset();
 	}
 
 	Volume = NewVolume;
@@ -144,7 +134,7 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 
 void UBasicVolumeComponent::DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness)
 {
-	if (m_octree)
+	if (m_octree.IsValid())
 	{
 		m_octree->Traverse([=](FSparseOctreeNode* node) -> ETraverseOptions
 		{
@@ -164,7 +154,7 @@ void UBasicVolumeComponent::DrawDebugOctree(const FLinearColor& Color, float Dur
 void UBasicVolumeComponent::MarkVolumeDirty()
 {
 	// Rebuild mesh
-	if (m_octree)
+	if (m_octree.IsValid())
 	{
 		m_octree->MarkChange(Volume->GetEnclosingRegion(), FTimespan(0, 0, FPlatformTime::Seconds()));
 	}
@@ -177,8 +167,8 @@ void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 
 void UBasicVolumeComponent::EnsureRendering()
 {
-	if (Volume != nullptr && m_octree == nullptr)
+	if (Volume != nullptr && m_octree.IsValid())
 	{
-		m_octree = new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells);
+		m_octree = MakeShareable(new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells));
 	}
 }
