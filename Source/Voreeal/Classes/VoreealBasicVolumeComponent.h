@@ -42,6 +42,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void MarkVolumeDirty();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
+	FORCEINLINE bool PickVoxel(const FVector& Start, const FVector& End, EPickVoxelType PickVoxelType, FIntVector& HitPoint) const
+	{
+		switch (PickVoxelType) {
+		default:
+		case EPickVoxelType::PickFirst: return PickFirstSolidVoxel(Start, End, HitPoint);
+		case EPickVoxelType::PickLast: return PickLastSolidVoxel(Start, End, HitPoint);
+		}
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
+	virtual bool PickFirstSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
+	virtual bool PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const;
+
 private:
 	UFUNCTION()
 	void OnVolumeChanged(FVoreealRegion Region);

@@ -238,6 +238,8 @@ void FSparseOctree::BuildNode(int32 parentId)
 
 void FSparseOctree::MarkChange(const int32& Index, const FVoreealRegion& Region, const FTimespan& ChangeTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_OctreeChange);
+
 	FSparseOctreeNode* Node = m_children[Index];
 
 	if (FVoreealRegion::Intersect(Node->m_bounds, Region))

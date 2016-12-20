@@ -19,6 +19,26 @@ UVoreealVolumeComponent::UVoreealVolumeComponent(const class FObjectInitializer&
 	Identifier = Runnable ? Runnable->RequestNewIdentifier() : -1;
 }
 
+void UVoreealVolumeComponent::WorldPositionToVolumePosition(const FVector& worldPosition, FVector& result) const
+{
+	result = GetComponentTransform().InverseTransformPosition(worldPosition);
+}
+
+void UVoreealVolumeComponent::VolumePositionToWorldPosition(const FVector& localPosition, FVector& result) const
+{
+	result = GetComponentTransform().TransformPosition(localPosition);
+}
+
+void UVoreealVolumeComponent::WorldDirectionToVolumeDirection(const FVector& worldDirection, FVector& result) const
+{
+	result = GetComponentTransform().InverseTransformVectorNoScale(worldDirection);
+}
+
+void UVoreealVolumeComponent::VolumeDirectionToWorldDirection(const FVector& localDirection, FVector& result) const
+{
+	result = GetComponentTransform().TransformVectorNoScale(localDirection);
+}
+
 bool UVoreealVolumeComponent::FindFinishedTask(TSharedPtr<FVoreealMesh>& Result)
 {
 	Result = nullptr;

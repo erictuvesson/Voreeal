@@ -164,6 +164,62 @@ void UBasicVolume::ResizeRegion(const FVoreealRegion& NewRegion)
 	}
 }
 
+bool UBasicVolume::PickFirstSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
+{
+	HitPoint = FIntVector(0, 0, 0);
+
+	if (!Volume.IsValid())
+	{
+		return false;
+	}
+
+	PolyVox::Vector3DFloat PStart(Start.X, Start.Y, Start.Z);
+	PolyVox::Vector3DFloat PEnd(End.X, End.Y, End.Z);
+	PolyVox::Vector3DFloat PDir = PEnd - PStart;
+
+	PolyVox::MaterialDensityPair88 EmptyVoxel(0, 0);
+
+	PolyVox::PickResult PickResult = PolyVox::pickVoxel(Volume.Get(), PStart, PDir, EmptyVoxel);
+	if (PickResult.didHit)
+	{
+		HitPoint = FIntVector(
+			PickResult.hitVoxel.getX(),
+			PickResult.hitVoxel.getY(),
+			PickResult.hitVoxel.getZ());
+		return true;
+	}
+
+	return false;
+}
+
+bool UBasicVolume::PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
+{
+	HitPoint = FIntVector(0, 0, 0);
+
+	if (!Volume.IsValid())
+	{
+		return false;
+	}
+
+	PolyVox::Vector3DFloat PStart(Start.X, Start.Y, Start.Z);
+	PolyVox::Vector3DFloat PEnd(End.X, End.Y, End.Z);
+	PolyVox::Vector3DFloat PDir = PEnd - PStart;
+
+	PolyVox::MaterialDensityPair88 EmptyVoxel(0, 0);
+
+	PolyVox::PickResult PickResult = PolyVox::pickVoxel(Volume.Get(), PStart, PDir, EmptyVoxel);
+	if (PickResult.didHit && PickResult.hasPreviousVoxel)
+	{
+		HitPoint = FIntVector(
+			PickResult.previousVoxel.getX(),
+			PickResult.previousVoxel.getY(),
+			PickResult.previousVoxel.getZ());
+		return true;
+	}
+
+	return false;
+}
+
 #if WITH_EDITOR
 void UBasicVolume::ValidateSocketNames()
 {

@@ -70,6 +70,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
 	void ResizeRegion(const FVoreealRegion& NewRegion);
 
+	// Pick in local volume space.
+	virtual bool PickFirstSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const;
+
+	// Pick in local volume space.
+	virtual bool PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const;
+
 public:
 #if WITH_EDITORONLY_DATA
 	// Importing data and options used

@@ -193,7 +193,9 @@ FPagedVolumeChunk* UPagedVolumeComponent::CreateChunk(int32 X, int32 Y, int32 Z)
 
 	FVoreealRegion Region = FVoreealRegion(X * 128, Y * 128, Z * 128, 128, 128, 128);
 
-	TSharedPtr<FPagedVolumeChunk> Result = MakeShareable(new FPagedVolumeChunk(MakeShareable(new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells)), LocationHash, Region));
+	TSharedPtr<FPagedVolumeChunk> Result = 
+		MakeShareable(new FPagedVolumeChunk(
+			MakeShareable(new FSparseOctree(Volume, this, Region, EOctreeConstructionModes::BoundCells)), LocationHash, Region));
 
 	ArrayChunks.Add(Result);
 

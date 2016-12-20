@@ -62,10 +62,9 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 
 				FVoreealExtractorOptions Options(TWeakPtr<FSparseOctree>(m_octree), node->m_selfId, node->m_bounds, 0);
 
+				SCOPE_CYCLE_COUNTER(STAT_RequestMesh);
+
 				AddTask(Volume, Options);
-
-
-				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Queue Task!"));
 			}
 
 			return ETraverseOptions::Continue;
@@ -85,7 +84,7 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 				Node->m_meshLastChanged = FTimespan(0, 0, FPlatformTime::Seconds());
 				Node->m_bTaskRunning = false;
 
-				//UE_LOG(LogTemp, Warning, TEXT("Voreeal: Finish Task!"));
+				SCOPE_CYCLE_COUNTER(STAT_ReturnMesh);
 			}
 		}
 	}
@@ -160,6 +159,38 @@ void UBasicVolumeComponent::MarkVolumeDirty()
 	}
 }
 
+bool UBasicVolumeComponent::PickFirstSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
+{
+	if (Volume == nullptr)
+	{
+		return false;
+	}
+
+	FVector NewStart;
+	FVector NewEnd;
+
+	WorldPositionToVolumePosition(Start, NewStart);
+	WorldPositionToVolumePosition(End, NewEnd);
+
+	return Volume->PickFirstSolidVoxel(NewStart, NewEnd, HitPoint);
+}
+
+bool UBasicVolumeComponent::PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
+{
+	if (Volume == nullptr)
+	{
+		return false;
+	}
+
+	FVector NewStart;
+	FVector NewEnd;
+
+	WorldPositionToVolumePosition(Start, NewStart);
+	WorldPositionToVolumePosition(End, NewEnd);
+
+	return Volume->PickLastSolidVoxel(NewStart, NewEnd, HitPoint);
+}
+
 void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 {
 	m_octree->MarkChange(Region, FTimespan(0, 0, FPlatformTime::Seconds()));
@@ -167,7 +198,7 @@ void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 
 void UBasicVolumeComponent::EnsureRendering()
 {
-	if (Volume != nullptr && m_octree.IsValid())
+	if (Volume != nullptr && !m_octree.IsValid())
 	{
 		m_octree = MakeShareable(new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells));
 	}
