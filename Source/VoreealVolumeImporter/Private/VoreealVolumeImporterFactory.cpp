@@ -2,7 +2,6 @@
 #include "VoreealVolumeImporterFactory.h"
 
 #include "VoreealBasicVolume.h"
-#include "VoreealVoxelPalette.h"
 
 #include "VoreealImporter.h"
 
@@ -25,18 +24,8 @@ UVoreealVolumeImporterFactory::UVoreealVolumeImporterFactory(const FObjectInitia
 
 	IVoreealImporterModule& VoreealImporter = IVoreealImporterModule::Get();
 
-	/*VoreealImporter.OnImportersChanged.BindLambda([]()
-	{
-		Formats.Clear();
-
-		auto Importers = VoreealImporter.GetImporters();
-		for (auto Importer : Importers)
-		{
-			Formats.Add(Importer.GetFileText());
-		}
-	});*/
-
 	Formats.Add("vox;MagicaVoxel/Voxlap");
+	Formats.Add("qb;Qubicle Binary");
 }
 
 FText UVoreealVolumeImporterFactory::GetDisplayName() const
@@ -46,8 +35,7 @@ FText UVoreealVolumeImporterFactory::GetDisplayName() const
 
 bool UVoreealVolumeImporterFactory::DoesSupportClass(UClass * Class)
 {
-	return (Class == UBasicVolume::StaticClass()
-		|| Class == UVoxelPalette::StaticClass());
+	return Class == UBasicVolume::StaticClass();
 }
 
 UClass* UVoreealVolumeImporterFactory::ResolveSupportedClass()
@@ -110,10 +98,6 @@ bool UVoreealVolumeImporterFactory::CanReimport(UObject* Obj, TArray<FString>& O
 {
 	UAssetImportData* ImportData = nullptr;
 	if (Obj->GetClass() == UBasicVolume::StaticClass())
-	{
-		// TODO: 
-	}
-	else if (Obj->GetClass() == UVoxelPalette::StaticClass())
 	{
 		// TODO: 
 	}
