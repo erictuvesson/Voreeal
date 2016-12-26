@@ -9,6 +9,8 @@ struct FVoxelData
 
 	FColor Color;
 	
+	UMaterial* Material;
+
 };
 
 UCLASS(Blueprintable)

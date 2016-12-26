@@ -1,8 +1,6 @@
 #include "VoreealEditorPrivatePCH.h"
 #include "BasicVolumeComponentDetailsCustomization.h"
 
-#include "BasicVolumeComponentDetailsCustomization.h"
-
 #define LOCTEXT_NAMESPACE "VoreealEditor"
 
 TSharedRef<IDetailCustomization> FBasicVolumeComponentDetailsCustomization::MakeInstance()
