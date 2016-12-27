@@ -22,11 +22,11 @@ bool UVoreealPagedVolume::IsValid() const
 	return Volume.IsValid();
 }
 
-void UVoreealPagedVolume::GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
+void UVoreealPagedVolume::GetVoxel(const FVector& Location, FColor& Material, uint8& Density)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	PolyVox::MaterialDensityPair88 Data = Volume->getVoxel(pos);
-	Material = Data.getMaterial();
+	PolyVox::MaterialDensityPair32 Data = Volume->getVoxel(pos);
+	Material = FColor(Data.getMaterial());
 	Density = Data.getDensity();
 }
 
@@ -69,12 +69,12 @@ uint32 UVoreealPagedVolume::CalculateSizeInBytes()
 	return IsValid() ? Volume->calculateSizeInBytes() : 0;
 }
 
-bool UVoreealPagedVolume::Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
+bool UVoreealPagedVolume::Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density)
 {
 	// TODO: Check bounds
 
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	Volume->setVoxel(pos, PolyVox::MaterialDensityPair88(Material, Density));
+	Volume->setVoxel(pos, PolyVox::MaterialDensityPair32(Material.DWColor(), Density));
 
 	OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
 

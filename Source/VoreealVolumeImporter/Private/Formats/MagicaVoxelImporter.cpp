@@ -1,6 +1,8 @@
 #include "../VoreealVolumeImporterPrivatePCH.h"
 #include "MagicaVoxelImporter.h"
 
+// https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
+
 // FColor's data structure is BGRA, so lets just use this class when serializing.
 class FColorRGBA
 {
@@ -33,14 +35,16 @@ public:
 	}
 
 	// size
-	int sizex, sizey, sizez;
+	int sizex = 0;
+	int sizey = 0;
+	int sizez = 0;
 
 	// voxels
-	int numVoxels;
-	MV_Voxel* voxels;
+	int numVoxels = 0;
+	MV_Voxel* voxels = nullptr;
 
 	// palette
-	bool isCustomPalette;
+	bool isCustomPalette = false;
 	FColorRGBA palette[256];
 
 	// version
@@ -54,6 +58,7 @@ public:
 		const int ID_SIZE = MV_ID('S', 'I', 'Z', 'E');
 		const int ID_XYZI = MV_ID('X', 'Y', 'Z', 'I');
 		const int ID_RGBA = MV_ID('R', 'G', 'B', 'A');
+		const int ID_MATT = MV_ID('M', 'A', 'T', 'T'); //< TODO: optional
 
 		int32 magic;
 		Ar << magic;
@@ -149,6 +154,13 @@ bool FMagicaVoxelImporter::Import(FArchive& Ar, UBasicVolume* Volume, FFeedbackC
 	MV_Model model;
 	if (!model.LoadModel(Ar, Warn))
 	{
+		Warn->Logf(ELogVerbosity::Error, TEXT("Cannot load file header."));
+		return false;
+	}
+
+	if (model.sizex <= 0 || model.sizey <= 0 || model.sizez <= 0)
+	{
+		Warn->Logf(ELogVerbosity::Error, TEXT("Volume has no size."));
 		return false;
 	}
 
@@ -176,7 +188,7 @@ bool FMagicaVoxelImporter::Import(FArchive& Ar, UBasicVolume* Volume, FFeedbackC
 			rgba.r = (color >> 0) & 0xFF;
 		}
 
-		Volume->SetVoxelXYZ((int32)voxel.x, (int32)voxel.y, (int32)voxel.z, 1, 255);
+		Volume->SetVoxelXYZ((int32)voxel.x, (int32)voxel.y, (int32)voxel.z, FColor(rgba.r, rgba.g, rgba.b), 255);
 	}
 
 	return true;

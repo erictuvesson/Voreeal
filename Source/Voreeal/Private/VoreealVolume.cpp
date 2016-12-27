@@ -21,7 +21,7 @@ FVoreealExtractorOptions FVoreealMesh::GetOptions() const
 	return Options;
 }
 
-void UVoreealVolume::SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
+void UVoreealVolume::SetVoxel(FVector Location, const FColor& Material, const uint8& Density)
 {
 	// Allow suppress then re-enable
 	//OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
@@ -41,7 +41,7 @@ FVoreealMesh UVoreealVolume::ExtractMesh(const FVoreealExtractorOptions& Options
 	return FVoreealMesh(Options);
 }
 
-bool UVoreealVolume::Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
+bool UVoreealVolume::Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density)
 {
 	check(0 && "abstract");
 	return false;
@@ -57,7 +57,7 @@ void UVoreealVolume::SerializeVolume(FArchive& Ar, FVoreealRegion& Region)
 	// TODO: Write Version
 	Ar << Region;
 
-	uint8 Material;
+	FColor Material;
 	uint8 Density;
 	for (int32 x = Region.X; x < (Region.X + Region.Width); x++)
 	{
@@ -66,7 +66,7 @@ void UVoreealVolume::SerializeVolume(FArchive& Ar, FVoreealRegion& Region)
 			for (int32 z = Region.Z; z < (Region.Z + Region.Depth); z++)
 			{
 				GetVoxel(FVector(x, y, z), Material, Density);
-				Ar << Material << Density;
+				Ar << Material.DWColor() << Density;
 			}
 		}
 	}
@@ -80,7 +80,7 @@ void UVoreealVolume::DeserializeVolume(FArchive& Ar)
 
 	Internal_SetSize(region, true);
 
-	uint8 Material;
+	FColor Material;
 	uint8 Density;
 	for (int32 x = region.X; x < (region.X + region.Width); x++)
 	{

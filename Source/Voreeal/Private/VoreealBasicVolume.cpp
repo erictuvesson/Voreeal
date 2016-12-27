@@ -96,11 +96,17 @@ bool UBasicVolume::IsValid() const
 	return Volume.IsValid();
 }
 
-void UBasicVolume::GetVoxel(const FVector& Location, uint8& Material, uint8& Density)
+void UBasicVolume::GetVoxel(const FVector& Location, FColor& Material, uint8& Density)
 {
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	PolyVox::MaterialDensityPair88 Data = Volume->getVoxel(pos);
-	Material = Data.getMaterial();
+	PolyVox::MaterialDensityPair32 Data = Volume->getVoxel(pos);
+
+	uint32 Color = Data.getMaterial();
+	Material.B = (Color && 0x000000FF) << 16;
+	Material.G = (Color && 0x0000FF00) << 8;
+	Material.R = (Color && 0x00FF0000);
+	Material.A = 255;
+	
 	Density = Data.getDensity();
 }
 
@@ -109,7 +115,7 @@ FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 	return ExtractMeshHelper(Volume.Get(), ExtractorType, Options);
 }
 
-bool UBasicVolume::Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density)
+bool UBasicVolume::Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density)
 {
 	if (!FVoreealRegion::Contains(GetEnclosingRegion(), Location))
 	{
@@ -118,7 +124,13 @@ bool UBasicVolume::Internal_SetVoxel(FVector Location, const uint8& Material, co
 	}
 
 	PolyVox::Vector3DInt32 pos(Location.X, Location.Y, Location.Z);
-	Volume->setVoxel(pos, PolyVox::MaterialDensityPair88(Material, Density));
+
+	uint32 Color = 
+		(Material.B & 255) << 16 |
+		(Material.G & 255) << 8 |
+		(Material.R & 255);
+
+	Volume->setVoxel(pos, PolyVox::MaterialDensityPair32(Color, Density));
 
 	OnChanged.Broadcast(FVoreealRegion(Location.X, Location.Y, Location.Z, 1, 1, 1));
 
@@ -177,7 +189,7 @@ bool UBasicVolume::PickFirstSolidVoxel(const FVector& Start, const FVector& End,
 	PolyVox::Vector3DFloat PEnd(End.X, End.Y, End.Z);
 	PolyVox::Vector3DFloat PDir = PEnd - PStart;
 
-	PolyVox::MaterialDensityPair88 EmptyVoxel(0, 0);
+	PolyVox::MaterialDensityPair32 EmptyVoxel(0, 0);
 
 	PolyVox::PickResult PickResult = PolyVox::pickVoxel(Volume.Get(), PStart, PDir, EmptyVoxel);
 	if (PickResult.didHit)
@@ -205,7 +217,7 @@ bool UBasicVolume::PickLastSolidVoxel(const FVector& Start, const FVector& End, 
 	PolyVox::Vector3DFloat PEnd(End.X, End.Y, End.Z);
 	PolyVox::Vector3DFloat PDir = PEnd - PStart;
 
-	PolyVox::MaterialDensityPair88 EmptyVoxel(0, 0);
+	PolyVox::MaterialDensityPair32 EmptyVoxel(0, 0);
 
 	PolyVox::PickResult PickResult = PolyVox::pickVoxel(Volume.Get(), PStart, PDir, EmptyVoxel);
 	if (PickResult.didHit && PickResult.hasPreviousVoxel)

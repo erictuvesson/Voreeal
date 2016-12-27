@@ -120,13 +120,13 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			Result.Vertices.Add(RegionLower + VertexPosition);
 			//Result.Normals.Add(VertexNormal);
 
-			//FColor Color;
-			//Color.R = (vertex.data & 0x000000FF);
-			//Color.G = (vertex.data & 0x0000FF00) >> 8;
-			//Color.B = (vertex.data & 0x00FF0000) >> 16;
-			//Color.A = (vertex.data & 0xFF000000) >> 24;
-			//
-			//Result.VertexColors.Add(Color);
+			FColor Color;
+			Color.R = (vertex.data.getMaterial() & 0x000000FF);
+			Color.G = (vertex.data.getMaterial() & 0x0000FF00) >> 8;
+			Color.B = (vertex.data.getMaterial() & 0x00FF0000) >> 16;
+			Color.A = 255; // (vertex.data & 0xFF000000) >> 24;
+			
+			Result.VertexColors.Add(Color);
 		}
 
 		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i += 3)
@@ -165,6 +165,7 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 
 			Result.Vertices.Add(RegionLower + VertexPosition);
 			Result.Normals.Add(VertexNormal);
+			Result.VertexColors.Add(FColor(vertex.data.getMaterial()));
 		}
 
 		for (int32 i = 0; i < (int32)mesh.getNoOfIndices(); i += 3)

@@ -3,15 +3,19 @@
 #include "UnrealEd.h"
 #include "VoreealVolumeImporterFactory.generated.h"
 
-class FBasicVolumeImporter;
+class FVoreealImporter;
 
 UCLASS(hidecategories = Object)
 class UVoreealVolumeImporterFactory : public UFactory, public FReimportHandler
 {
 	GENERATED_BODY()
 
+private:
+	TArray<FVoreealImporter*> importers;
+
 public:
 	UVoreealVolumeImporterFactory(const class FObjectInitializer& ObjectInitializer);
+	virtual ~UVoreealVolumeImporterFactory();
 
 	// Begin UFactory Interface
 	virtual FText GetDisplayName() const override;

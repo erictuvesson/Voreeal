@@ -30,7 +30,7 @@ public:
 UCLASS(Blueprintable)
 class VOREEAL_API UVoreealPagedVolume
 	: public UVoreealVolume
-	, public VoreealExtractHelper<PolyVox::PagedVolume<PolyVox::MaterialDensityPair88>, PolyVox::MaterialDensityPair88>
+	, public VoreealExtractHelper<PolyVox::PagedVolume<PolyVox::MaterialDensityPair32>, PolyVox::MaterialDensityPair32>
 {
 	GENERATED_BODY()
 
@@ -39,7 +39,7 @@ public:
 
 	// Begin UVoreealVolume Interface
 	virtual bool IsValid() const override;
-	virtual void GetVoxel(const FVector& Location, uint8& Material, uint8& Density) override;
+	virtual void GetVoxel(const FVector& Location, FColor& Material, uint8& Density) override;
 	virtual FVoreealMesh ExtractMesh(const FVoreealExtractorOptions& Options) override;
 	// End UVoreealVolume Interface
 
@@ -63,7 +63,7 @@ public:
 	uint32 CalculateSizeInBytes();
 
 protected:
-	virtual bool Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density) override;
+	virtual bool Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density) override;
 
 private:
 	TSharedPtr<VolumeType> Volume;

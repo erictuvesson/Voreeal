@@ -9,6 +9,11 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FVolumeChanged, FVoreealRegion, Region);
 
+namespace PolyVox
+{
+	typedef MaterialDensityPair<uint32, 24, 8> MaterialDensityPair32;
+}
+
 /** Base Voxel Volume, used as a data format. */
 UCLASS(Abstract)
 class VOREEAL_API UVoreealVolume : public UObject
@@ -26,22 +31,22 @@ public:
 public:
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxelXYZ(int32 X, int32 Y, int32 Z, const uint8& Material, const uint8& Density) {
+	void SetVoxelXYZ(int32 X, int32 Y, int32 Z, const FColor& Material, const uint8& Density) {
 		SetVoxel(FVector(X, Y, Z), Material, Density);
 	}
 
 	// Set Voxel at Location.
-	void SetVoxel(FIntVector Location, const uint8& Material, const uint8& Density) {
+	void SetVoxel(FIntVector Location, const FColor& Material, const uint8& Density) {
 		SetVoxel(FVector(Location.X, Location.Y, Location.Z), Material, Density);
 	}
 
 	// Set Voxel at Location.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal")
-	void SetVoxel(FVector Location, const uint8& Material, const uint8& Density);
+	void SetVoxel(FVector Location, const FColor& Material, const uint8& Density);
 	
 	// Get Voxel at Location.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
-	virtual void GetVoxel(const FVector& Location, uint8& Material, uint8& Density) {}
+	virtual void GetVoxel(const FVector& Location, FColor& Material, uint8& Density) {}
 
 	// Checks if the volume is valid.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
@@ -55,6 +60,6 @@ public:
 	void DeserializeVolume(FArchive& Ar);
 
 protected:
-	virtual bool Internal_SetVoxel(FVector Location, const uint8& Material, const uint8& Density);
+	virtual bool Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density);
 	virtual void Internal_SetSize(const FVoreealRegion& Region, bool New);
 };

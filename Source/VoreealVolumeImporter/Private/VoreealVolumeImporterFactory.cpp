@@ -5,6 +5,10 @@
 
 #include "VoreealImporter.h"
 
+#include "Formats/MagicaVoxelImporter.h"
+#include "Formats/QubicleBinaryImporter.h"
+
+
 #include <AssetToolsModule.h>
 #include <AssetRegistryModule.h>
 #include <PackageTools.h>
@@ -22,10 +26,20 @@ UVoreealVolumeImporterFactory::UVoreealVolumeImporterFactory(const FObjectInitia
 	bEditorImport = true;
 	bText = false;
 
-	IVoreealImporterModule& VoreealImporter = IVoreealImporterModule::Get();
+	//IVoreealImporterModule& VoreealImporter = IVoreealImporterModule::Get();
 
 	Formats.Add("vox;MagicaVoxel/Voxlap");
 	Formats.Add("qb;Qubicle Binary");
+
+	importers.Add(new FMagicaVoxelImporter());
+	importers.Add(new FQubicleBinaryImporter());
+}
+
+UVoreealVolumeImporterFactory::~UVoreealVolumeImporterFactory()
+{
+	for (int32 i = 0; i < importers.Num(); i++)
+		delete importers[i];
+	importers.Empty();
 }
 
 FText UVoreealVolumeImporterFactory::GetDisplayName() const
@@ -62,9 +76,9 @@ UObject* UVoreealVolumeImporterFactory::FactoryCreateFile(UClass* InClass, UObje
 	FString FilenameExtension = FPaths::GetExtension(CurrentFilename);
 
 	// Loop all the importers
-	IVoreealImporterModule& VoreealImporter = IVoreealImporterModule::Get();
-	auto Importers = VoreealImporter.GetImporters();
-	for (auto Importer : Importers)
+	//IVoreealImporterModule& VoreealImporter = IVoreealImporterModule::Get();
+	//auto Importers = VoreealImporter.GetImporters();
+	for (auto Importer : importers)
 	{
 		// Check if the format matches the file extension
 		if (Importer->GetExtension() == FilenameExtension)
