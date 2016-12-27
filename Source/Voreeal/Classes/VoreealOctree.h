@@ -15,20 +15,20 @@ class FSparseOctree;
 /** Sparse Octree Voxel Bounds */
 enum class EOctreeConstructionModes
 {
-	/// Generate only mesh for voxels inside bounds.
+	// Generate only mesh for voxels inside bounds.
 	BoundVoxels = 0,
-	/// Generate all the voxel sides too.
+	// Generate all the voxel sides too.
 	BoundCells = 1
 };
 
 /** Determines how to traverse the next node when traversing a space partition tree. */
 enum class ETraverseOptions
 {
-	/// The traverse operation should continue to visit the next node.
+	// The traverse operation should continue to visit the next node.
 	Continue,
-	/// The traverse operation should skip the current node and its child nodes.
+	// The traverse operation should skip the current node and its child nodes.
 	Skip,
-	/// The traverse operation should stop visiting nodes.
+	// The traverse operation should stop visiting nodes.
 	Stop,
 };
 
@@ -38,25 +38,25 @@ struct FSparseOctreeNode
 	static const int32 InvalidNodeIndex = 0xFFFF;
 	static const int32 ChildrenCount = 8;
 
-	/// The self node id.
+	// The self node id.
 	int32 m_selfId;
 
-	/// The parent node id.
+	// The parent node id.
 	int32 m_parentId;
 
-	/// The nodes children.
+	// The nodes children.
 	int32 m_childrenId[ChildrenCount];
 
-	/// Does the node have children.
+	// Does the node have children.
 	uint8 m_hasChildren : 1;
 
-	/// The owning octree.
+	// The owning octree.
 	FSparseOctree* m_root;
 
-	/// The bounds of this node.
+	// The bounds of this node.
 	FVoreealRegion m_bounds;
 
-	/// The current height of this node.
+	// The current height of this node.
 	int32 m_height;
 
 	FTimespan m_dataLastModified;
@@ -65,23 +65,23 @@ struct FSparseOctreeNode
 
 	uint32 m_bTaskRunning : 1;
 
-	/// Constructor
+	// Constructor
 	FSparseOctreeNode(FVoreealRegion Region, int32 ParentId, FSparseOctree* Root);
 
-	/// Gets if the mesh is up to date.
+	// Gets if the mesh is up to date.
 	FORCEINLINE bool IsUpToDate() const 
 	{ 
 		return (m_meshLastChanged > m_dataLastModified); 
 	}
 
-	/// Gets if the mesh is sceduled for update.
+	// Gets if the mesh is sceduled for update.
 	FORCEINLINE bool IsSceduled() const 
 	{ 
 		return (m_lastSceduledForUpdate > m_dataLastModified) 
 			&& (m_lastSceduledForUpdate > m_meshLastChanged);
 	}
 
-	/// Gets if extraction mesh generation task is running.
+	// Gets if extraction mesh generation task is running.
 	FORCEINLINE bool IsTaskRunning() const
 	{
 		return m_bTaskRunning;

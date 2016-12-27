@@ -11,14 +11,7 @@ int32 UVoreealBlueprintLibrary::GetRunningTaskCount()
 	{
 		return UBasicVolumeComponent::Runnable->GetRunningTaskCount();
 	}
-	return 0;
-}
-
-void UVoreealBlueprintLibrary::DrawDebugTaskText(UObject* WorldContextObject, int32 Key, const FColor& Color)
-{
-	int32 TasksCount = GetRunningTaskCount();
-
-	GEngine->AddOnScreenDebugMessage(Key, 5.0, Color, FString::Printf(TEXT("Tasks Running: %d"), TasksCount));
+	return -1;
 }
 
 void UVoreealBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform,

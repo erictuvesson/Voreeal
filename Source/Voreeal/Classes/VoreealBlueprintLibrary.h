@@ -9,7 +9,6 @@ class VOREEAL_API UVoreealBlueprintLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public: // Region Methods
-
 	// Gets the center of the region.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal|Region")
 	static FVector GetCenter(const FVoreealRegion& Region) { return Region.GetCenter(); }
@@ -47,15 +46,11 @@ public: // Region Methods
 
 public:
 	// Gets how many tasks currently are running.
-	UFUNCTION(BlueprintCallable, Category = "Voreeal|Task")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal|Task")
 	static int32 GetRunningTaskCount();
 
-	UFUNCTION(BlueprintCallable, Category = "Voreeal|Task", meta = (WorldContext = "WorldContextObject"))
-	static void DrawDebugTaskText(UObject* WorldContextObject, int32 Key, const FColor& Color);
-
 public:
-
-	/// Draw Debug Region, 
+	// Draw Debug Region, 
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Region|Debug", meta = (WorldContext = "WorldContextObject"))
 	static void DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform, const FVoreealRegion& Region,
 		const FLinearColor& LinearColor, float Duration, float Thickness);

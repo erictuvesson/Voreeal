@@ -193,7 +193,7 @@ bool UBasicVolumeComponent::PickLastSolidVoxel(const FVector& Start, const FVect
 
 void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 {
-	m_octree->MarkChange(Region, FTimespan(0, 0, FPlatformTime::Seconds()));
+	m_octree->MarkChangeNow(Region);
 }
 
 void UBasicVolumeComponent::EnsureRendering()

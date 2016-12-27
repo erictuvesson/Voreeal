@@ -64,7 +64,7 @@ FSparseOctree::FSparseOctree(UVoreealVolume* Volume, UVoreealVolumeComponent* Vo
 
 	int32 octreeTargetSize = ::PolyVox::upperPowerOfTwo(largestDimension);
 
-	m_maxHeight = ::PolyVox::logBase2((octreeTargetSize) / m_baseNodeSize) - 1;
+	m_maxHeight = ::PolyVox::logBase2(octreeTargetSize / m_baseNodeSize) - 1;
 
 	int32 widthInc = octreeTargetSize - width;
 	int32 heightInc = octreeTargetSize - height;

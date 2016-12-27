@@ -16,6 +16,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
 	UBasicVolume* Volume;
 
+	// Override the extractor type.
+	uint32 bOverrideExtractor : 1;
+
+	// Extractor type to override.
+	UPROPERTY(EditDefaultsOnly, Category = "Voreeal")
+	EVolumeExtractor ExtractorType;
+
 public:
 	UBasicVolumeComponent(const class FObjectInitializer& ObjectInitializer);
 
@@ -35,6 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Components|Voreeal")
 	virtual bool SetBasicVolume(UBasicVolume* NewVolume);
 
+	// Debug draw the octree of the volume.
 	UFUNCTION(BlueprintCallable, Category = "Voreeal|Octree|Debug")
 	void DrawDebugOctree(const FLinearColor& Color, float Duration, float Thickness);
 	

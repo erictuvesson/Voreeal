@@ -250,5 +250,6 @@ FORCEINLINE bool FVoreealRegion::Contains(const FVoreealRegion& Region1, const F
 
 FORCEINLINE bool FVoreealRegion::Intersect(const FVoreealRegion& Region1, const FVoreealRegion& Region2)
 {
-	return Contains(Region1, Region2) == EContainmentType::Intersects;
+	EContainmentType Result = Contains(Region1, Region2);
+	return (Result == EContainmentType::Intersects) || (Result == EContainmentType::Contains);
 }
