@@ -3,133 +3,7 @@
 
 // https://github.com/ephtracy/voxel-model/blob/master/MagicaVoxel-file-format-vox.txt
 
-// FColor's data structure is BGRA, so lets just use this class when serializing.
-class FColorRGBA
-{
-public:
-	uint8 r, g, b, a;
-};
-
-int MV_ID(int a, int b, int c, int d)
-{ 
-	return (a) | (b << 8) | (c << 16) | (d << 24); 
-}
-
-class MV_Voxel 
-{
-public:
-	unsigned char x, y, z, colorIndex;
-};
-
-class MV_Model
-{
-public:
-	struct vox_chunk_t
-	{
-		int id, contentSize, childrenSize;
-	};
-
-	~MV_Model()
-	{
-		if (voxels) delete[] voxels;
-	}
-
-	// size
-	int sizex = 0;
-	int sizey = 0;
-	int sizez = 0;
-
-	// voxels
-	int numVoxels = 0;
-	MV_Voxel* voxels = nullptr;
-
-	// palette
-	bool isCustomPalette = false;
-	FColorRGBA palette[256];
-
-	// version
-	int version;
-
-	bool LoadModel(FArchive& Ar, FFeedbackContext* Warn)
-	{
-		const int MV_VERSION = 150;
-		const int ID_VOX = MV_ID('V', 'O', 'X', ' ');
-		const int ID_MAIN = MV_ID('M', 'A', 'I', 'N');
-		const int ID_SIZE = MV_ID('S', 'I', 'Z', 'E');
-		const int ID_XYZI = MV_ID('X', 'Y', 'Z', 'I');
-		const int ID_RGBA = MV_ID('R', 'G', 'B', 'A');
-		const int ID_MATT = MV_ID('M', 'A', 'T', 'T'); //< TODO: optional
-
-		int32 magic;
-		Ar << magic;
-		if (magic != ID_VOX)
-		{
-			Warn->Logf(ELogVerbosity::Error, TEXT("Magic number does not match. (%d != %d)"), magic, ID_VOX);
-			return false;
-		}
-
-		Ar << version;
-		if (version != MV_VERSION)
-		{
-			Warn->Logf(ELogVerbosity::Error, TEXT("Version does not match. (%d != %d)"), version, MV_VERSION);
-			return false;
-		}
-
-		// main chunk
-		vox_chunk_t mainChunk;
-		Ar << mainChunk.id << mainChunk.contentSize << mainChunk.childrenSize;
-
-		if (mainChunk.id != ID_MAIN)
-		{
-			Warn->Logf(ELogVerbosity::Error, TEXT("Main chunk is not found. :("));
-			return false;
-		}
-
-		while (!Ar.AtEnd())
-		{
-			// read chunk header
-			vox_chunk_t sub;
-			Ar << sub.id << sub.contentSize << sub.childrenSize;
-
-			if (sub.id == ID_SIZE)
-			{
-				// size
-				Ar << sizex << sizey << sizez;
-			}
-			else if (sub.id == ID_XYZI)
-			{
-				// numVoxels
-				Ar << numVoxels;
-				if (numVoxels < 0)
-				{
-					Warn->Logf(ELogVerbosity::Error, TEXT("Negative number of voxels. :("));
-					return false;
-				}
-
-				// voxels
-				if (numVoxels > 0)
-				{
-					voxels = new MV_Voxel[numVoxels];
-					Ar.Serialize(voxels, sizeof(MV_Voxel) * numVoxels);
-				}
-			}
-			else if (sub.id == ID_RGBA)
-			{
-				// last color is not used, so we only need to read 255 colors
-				isCustomPalette = true;
-				Ar.Serialize(palette + 1, sizeof(FColorRGBA) * 255);
-
-				// NOTICE : skip the last reserved color
-				FColorRGBA reserved;
-				Ar.Serialize(&reserved, sizeof(FColorRGBA));
-			}
-		}
-
-		return true;
-	}
-};
-
-const uint32 mv_default_palette[256] = 
+const uint32 mv_default_palette[256] =
 {
 	0x00000000, 0xffffffff, 0xffccffff, 0xff99ffff, 0xff66ffff, 0xff33ffff, 0xff00ffff, 0xffffccff, 0xffccccff, 0xff99ccff, 0xff66ccff, 0xff33ccff, 0xff00ccff, 0xffff99ff, 0xffcc99ff, 0xff9999ff,
 	0xff6699ff, 0xff3399ff, 0xff0099ff, 0xffff66ff, 0xffcc66ff, 0xff9966ff, 0xff6666ff, 0xff3366ff, 0xff0066ff, 0xffff33ff, 0xffcc33ff, 0xff9933ff, 0xff6633ff, 0xff3333ff, 0xff0033ff, 0xffff00ff,
@@ -149,35 +23,209 @@ const uint32 mv_default_palette[256] =
 	0xff880000, 0xff770000, 0xff550000, 0xff440000, 0xff220000, 0xff110000, 0xffeeeeee, 0xffdddddd, 0xffbbbbbb, 0xffaaaaaa, 0xff888888, 0xff777777, 0xff555555, 0xff444444, 0xff222222, 0xff111111
 };
 
+class FColorRGBA
+{
+public:
+	uint8 r, g, b, a;
+};
+
+class MV_Voxel 
+{
+public:
+	uint8 x, y, z, colorIndex;
+};
+
+class MagicaVoxelMaterial
+{
+public:
+	int32 Index;
+	int32 MaterialType;
+	float MaterialWeight;
+	int32 Properties;
+	// float * N
+};
+
+class MagicaVoxelModel
+{
+public:
+	// size
+	int32 sizex = 0;
+	int32 sizey = 0;
+	int32 sizez = 0;
+
+	// voxels
+	int32 numVoxels = 0;
+	MV_Voxel* voxels = nullptr;
+
+public:
+	~MagicaVoxelModel()
+	{
+		if (voxels)
+		{
+			delete[] voxels;
+		}
+	}
+};
+
+class MagicaVoxelFile
+{
+	static constexpr int32 MV_VERSION = 150;
+	static constexpr int32 ID_VOX_ = 0x20584F56;
+	static constexpr int32 ID_MAIN = 0x4E49414D;
+	static constexpr int32 ID_SIZE = 0x455A4953;
+	static constexpr int32 ID_XYZI = 0x495A5958;
+	static constexpr int32 ID_RGBA = 0x41424752;
+	static constexpr int32 ID_PACK = 0x4B434150;
+	static constexpr int32 ID_MATT = 0x5454414D;
+
+public:
+	// version
+	int32 Version;
+	int32 MagicNumber;
+
+	// palette
+	bool bIsCustomPalette = false;
+	FColorRGBA Palette[256];
+
+	// Num of SIZE and XYZI chunks
+	int32 NumModels = 1;
+	TArray<MagicaVoxelModel> Models;
+
+public:
+	bool ValidSize()
+	{
+		for (auto model : Models)
+		{
+			if (model.sizex <= 0 || model.sizey <= 0 || model.sizez <= 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
+	bool Load(FArchive& Ar, FFeedbackContext* Warn)
+	{
+		struct vox_chunk_header {
+			int32 id, contentSize, childrenSize;
+		};
+
+		Ar << MagicNumber;
+		if (MagicNumber != ID_VOX_)
+		{
+			Warn->Logf(ELogVerbosity::Error, TEXT("Magic number does not match. (%X != %X)"), MagicNumber, ID_VOX_);
+			return false;
+		}
+
+		Ar << Version;
+		if (Version != MV_VERSION)
+		{
+			Warn->Logf(ELogVerbosity::Error, TEXT("Version does not match. (%d != %d)"), Version, MV_VERSION);
+			return false;
+		}
+
+		// main chunk
+		vox_chunk_header mainChunk;
+		Ar << mainChunk.id << mainChunk.contentSize << mainChunk.childrenSize;
+
+		if (mainChunk.id != ID_MAIN)
+		{
+			Warn->Logf(ELogVerbosity::Error, TEXT("Main chunk was not found."));
+			return false;
+		}
+
+		MagicaVoxelModel CurrentModel;
+		while (!Ar.AtEnd())
+		{
+			// read chunk header
+			vox_chunk_header sub;
+			Ar << sub.id << sub.contentSize << sub.childrenSize;
+
+			switch (sub.id)
+			{
+			case ID_PACK:
+			{
+				Ar << NumModels;
+				break;
+			}
+			case ID_SIZE: // Read the volume size
+			{
+				Ar << CurrentModel.sizex << CurrentModel.sizey << CurrentModel.sizez;
+				break;
+			}
+			case ID_XYZI: // Validate the voxel count and read the voxels
+			{
+				Ar << CurrentModel.numVoxels;
+
+				if (CurrentModel.numVoxels < 0)
+				{
+					Warn->Logf(ELogVerbosity::Error, TEXT("Negative number of voxels. :("));
+					return false;
+				}
+
+				CurrentModel.voxels = new MV_Voxel[CurrentModel.numVoxels];
+				Ar.Serialize(CurrentModel.voxels, sizeof(MV_Voxel) * CurrentModel.numVoxels);
+				
+				Models.Add(CurrentModel);
+				CurrentModel = MagicaVoxelModel();
+				
+				break;
+			}
+			case ID_RGBA: // Read the custom palette
+			{
+				// last color is not used, so we only need to read 255 colors
+				bIsCustomPalette = true;
+				Ar.Serialize(Palette + 1, sizeof(FColorRGBA) * 255);
+
+				// NOTICE : skip the last reserved color
+				FColorRGBA reserved;
+				Ar.Serialize(&reserved, sizeof(FColorRGBA));
+				break;
+			}
+			default:
+				// TODO: throw exception
+				Ar.Seek(sub.contentSize);
+				Ar.Seek(sub.childrenSize);
+				break;
+			}
+		}
+
+		return true;
+	}
+};
+
 bool FMagicaVoxelImporter::Import(FArchive& Ar, UBasicVolume* Volume, FFeedbackContext* Warn)
 {
-	MV_Model model;
-	if (!model.LoadModel(Ar, Warn))
+	MagicaVoxelFile file;
+	if (!file.Load(Ar, Warn))
 	{
 		Warn->Logf(ELogVerbosity::Error, TEXT("Cannot load file header."));
 		return false;
 	}
 
-	if (model.sizex <= 0 || model.sizey <= 0 || model.sizez <= 0)
+	if (!file.ValidSize())
 	{
 		Warn->Logf(ELogVerbosity::Error, TEXT("Volume has no size."));
 		return false;
 	}
 
-	PolyVox::Region region;
-	region.setLowerCorner(PolyVox::Vector3DInt32(0, 0, 0));
-	region.setUpperCorner(PolyVox::Vector3DInt32(model.sizex, model.sizey, model.sizez));
+	//PolyVox::Region region;
+	//region.setLowerCorner(PolyVox::Vector3DInt32(0, 0, 0));
+	//region.setUpperCorner(PolyVox::Vector3DInt32(file.Models[0].sizex, file.Models[0].sizey, file.Models[0].sizez));
 
-	Volume->Resize(FIntVector(model.sizex, model.sizez, model.sizey));
+	// TODO: Match models
+	MagicaVoxelModel model = file.Models[0];
 
+	Volume->Resize(FIntVector(model.sizex, model.sizey, model.sizez));
+	
 	for (int32 i = 0; i < model.numVoxels; i++)
 	{
 		auto voxel = model.voxels[i];
 
 		FColorRGBA rgba;
-		if (model.isCustomPalette)
+		if (file.bIsCustomPalette)
 		{
-			rgba = model.palette[model.voxels[i].colorIndex];
+			rgba = file.Palette[model.voxels[i].colorIndex];
 		}
 		else
 		{
