@@ -38,7 +38,7 @@ FBasicVolumeEditorViewportClient::FBasicVolumeEditorViewportClient(TWeakPtr<FBas
 	bManipulationDirtiedSomething = false;
 	ScopedTransaction = nullptr;
 
-	bShowOctree = false;
+	bShowOctree = true;
 	bShowSockets = true;
 	bShowPivot = true;
 
@@ -147,11 +147,11 @@ void FBasicVolumeEditorViewportClient::DrawCanvas(FViewport& pViewport, FSceneVi
 		break;
 	}
 
-	//if (bShowSockets && !IsInSourceRegionEditMode())
-	//{
-	//	FSpriteGeometryEditMode* GeometryEditMode = ModeTools->GetActiveModeTyped<FSpriteGeometryEditMode>(FSpriteGeometryEditMode::EM_SpriteGeometry);
-	//	FSocketEditingHelper::DrawSocketNames(GeometryEditMode, RenderVolumeComponent, Viewport, View, Canvas);
-	//}
+	if (bShowSockets && !IsInEditMode())
+	{
+		//FSpriteGeometryEditMode* GeometryEditMode = ModeTools->GetActiveModeTyped<FSpriteGeometryEditMode>(FSpriteGeometryEditMode::EM_SpriteGeometry);
+		//FSocketEditingHelper::DrawSocketNames(GeometryEditMode, RenderVolumeComponent, Viewport, View, Canvas);
+	}
 
 	FEditorViewportClient::DrawCanvas(pViewport, View, Canvas);
 }
@@ -160,20 +160,21 @@ void FBasicVolumeEditorViewportClient::Draw(const FSceneView* View, FPrimitiveDr
 {
 	FEditorViewportClient::Draw(View, PDI);
 
-	//// We don't draw the pivot when showing the source region
-	//// The pivot may be outside the actual texture bounds there
-	//if (bShowPivot && !bShowSourceTexture && !IsInSourceRegionEditMode())
-	//{
-	//	const bool bCanSelectPivot = false;
-	//	const bool bHitTestingForPivot = PDI->IsHitTesting() && bCanSelectPivot;
-	//	FUnrealEdUtils::DrawWidget(View, PDI, RenderSpriteComponent->ComponentToWorld.ToMatrixWithScale(), 0, 0, EAxisList::XZ, EWidgetMovementMode::WMM_Translate, bHitTestingForPivot);
-	//}
+	if (IsInEditMode())
+	{
+		if (bShowPivot)
+		{
+			const bool bCanSelectPivot = false;
+			const bool bHitTestingForPivot = PDI->IsHitTesting() && bCanSelectPivot;
+			FUnrealEdUtils::DrawWidget(View, PDI, RenderVolumeComponent->ComponentToWorld.ToMatrixWithScale(), 0, 0, EAxisList::XZ, EWidgetMovementMode::WMM_Translate, bHitTestingForPivot);
+		}
 
-	//if (bShowSockets && !IsInSourceRegionEditMode())
-	//{
-	//	FSpriteGeometryEditMode* GeometryEditMode = ModeTools->GetActiveModeTyped<FSpriteGeometryEditMode>(FSpriteGeometryEditMode::EM_SpriteGeometry);
-	//	FSocketEditingHelper::DrawSockets(GeometryEditMode, RenderSpriteComponent, View, PDI);
-	//}
+		if (bShowSockets)
+		{
+			//FSpriteGeometryEditMode* GeometryEditMode = ModeTools->GetActiveModeTyped<FSpriteGeometryEditMode>(FSpriteGeometryEditMode::EM_SpriteGeometry);
+			//FSocketEditingHelper::DrawSockets(GeometryEditMode, RenderSpriteComponent, View, PDI);
+		}
+	}
 }
 
 FBox FBasicVolumeEditorViewportClient::GetDesiredFocusBounds() const
@@ -209,61 +210,8 @@ void FBasicVolumeEditorViewportClient::ProcessClick(FSceneView& View, HHitProxy*
 	const bool bIsCtrlKeyDown = Viewport->KeyState(EKeys::LeftControl) || Viewport->KeyState(EKeys::RightControl);
 	const bool bIsShiftKeyDown = Viewport->KeyState(EKeys::LeftShift) || Viewport->KeyState(EKeys::RightShift);
 	const bool bIsAltKeyDown = Viewport->KeyState(EKeys::LeftAlt) || Viewport->KeyState(EKeys::RightAlt);
+
 	bool bHandled = false;
-
-	//HSpriteSelectableObjectHitProxy* SelectedItemProxy = HitProxyCast<HSpriteSelectableObjectHitProxy>(HitProxy);
-	//
-	//if (IsInSourceRegionEditMode())
-	//{
-	//	if ((Event == EInputEvent::IE_DoubleClick) && (Key == EKeys::LeftMouseButton))
-	//	{
-	//		FVector4 WorldPoint = View.PixelToWorld(HitX, HitY, 0);
-	//		UPaperSprite* Sprite = GetSpriteBeingEdited();
-	//		FVector2D TexturePoint = SourceTextureViewComponent->GetSprite()->ConvertWorldSpaceToTextureSpace(WorldPoint);
-	//		if (bIsCtrlKeyDown)
-	//		{
-	//			const FVector2D StartingUV = Sprite->GetSourceUV();
-	//			const FVector2D StartingSize = Sprite->GetSourceSize();
-	//
-	//			if (UPaperSprite* NewSprite = CreateNewSprite(FIntPoint((int32)StartingUV.X, (int32)StartingUV.Y), FIntPoint((int32)StartingSize.X, (int32)StartingSize.Y)))
-	//			{
-	//				NewSprite->ExtractSourceRegionFromTexturePoint(TexturePoint);
-	//				bHandled = true;
-	//			}
-	//		}
-	//		else
-	//		{
-	//			Sprite->ExtractSourceRegionFromTexturePoint(TexturePoint);
-	//			bHandled = true;
-	//		}
-	//	}
-	//	else if ((Event == EInputEvent::IE_Released) && (Key == EKeys::LeftMouseButton))
-	//	{
-	//		FVector4 WorldPoint = View.PixelToWorld(HitX, HitY, 0);
-	//		FVector2D TexturePoint = SourceTextureViewComponent->GetSprite()->ConvertWorldSpaceToTextureSpace(WorldPoint);
-	//		for (int32 RelatedSpriteIndex = 0; RelatedSpriteIndex < RelatedSprites.Num(); ++RelatedSpriteIndex)
-	//		{
-	//			FRelatedSprite& RelatedSprite = RelatedSprites[RelatedSpriteIndex];
-	//			if ((TexturePoint.X >= RelatedSprite.SourceUV.X) && (TexturePoint.Y >= RelatedSprite.SourceUV.Y) &&
-	//				(TexturePoint.X < (RelatedSprite.SourceUV.X + RelatedSprite.SourceDimension.X)) &&
-	//				(TexturePoint.Y < (RelatedSprite.SourceUV.Y + RelatedSprite.SourceDimension.Y)))
-	//			{
-	//				bHandled = true;
-	//
-	//				// Select this sprite
-	//				if (UPaperSprite* LoadedSprite = Cast<UPaperSprite>(RelatedSprite.AssetData.GetAsset()))
-	//				{
-	//					if (SpriteEditorPtr.IsValid())
-	//					{
-	//						SpriteEditorPtr.Pin()->SetSpriteBeingEdited(LoadedSprite);
-	//						break;
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	if (!bHandled)
 	{
 		FVoreealEditorViewportClient::ProcessClick(View, HitProxy, Key, Event, HitX, HitY);
