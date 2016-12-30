@@ -34,11 +34,19 @@ struct VOREEAL_API FVoreealExtractorOptions
 	// The level of detail we are extracting.
 	int32 LOD;
 
+	// Override the extractor type.
+	uint32 bOverrideExtractor : 1;
+
+	// Extractor type to override.
+	EVolumeExtractor ExtractorType;
+
 	FVoreealExtractorOptions(TWeakPtr<FSparseOctree> Octree, int32 Identifier, FVoreealRegion Region, int32 LOD)
 		: Octree(Octree)
 		, Identifier(Identifier)
 		, Region(Region)
 		, LOD(LOD)
+		, bOverrideExtractor(false)
+		, ExtractorType(EVolumeExtractor::CubicSurface)
 	{
 
 	}

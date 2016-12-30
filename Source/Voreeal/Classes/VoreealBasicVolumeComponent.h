@@ -6,14 +6,15 @@
 #include "VoreealBasicVolumeComponent.generated.h"
 
 /** Basic Voxel Volume Component, a fixed volume. */
-UCLASS(ClassGroup = (Rendering, Common), HideCategories = (Object, Activation, "Components|Activation"), ShowCategories = (Mobility), EditInlineNew, meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Rendering, Common), HideCategories = (Object, Activation, "Components|Activation"), EditInlineNew, meta = (BlueprintSpawnableComponent))
 class VOREEAL_API UBasicVolumeComponent : public UVoreealVolumeComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Voxel Volume Asset
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
+	DEPRECATED(4.14, "Will be made private. Use GetVolume to get volume and SetBasicVolume to set the volume.")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Voreeal", meta = (DisplayThumbnail = "true"))
 	UBasicVolume* Volume;
 
 	// Override the extractor type.
@@ -39,6 +40,7 @@ public:
 	virtual void BeginPlay() override;
 	// End UActorComponent Interface
 
+	// Change the Voxel Volume used by this instance.
 	UFUNCTION(BlueprintCallable, Category = "Components|Voreeal")
 	virtual bool SetBasicVolume(UBasicVolume* NewVolume);
 
@@ -66,12 +68,21 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal")
 	virtual bool PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const;
 
+public:
+	// Get the Volume used by this instance. 
+	UBasicVolume* GetVolume() const
+	{
+		PRAGMA_DISABLE_DEPRECATION_WARNINGS
+		return Volume;
+		PRAGMA_ENABLE_DEPRECATION_WARNINGS
+	}
+
 private:
 	UFUNCTION()
 	void OnVolumeChanged(FVoreealRegion Region);
 
 	void EnsureRendering();
-
+	
 private:
 	TSharedPtr<FSparseOctree> m_octree;
 };

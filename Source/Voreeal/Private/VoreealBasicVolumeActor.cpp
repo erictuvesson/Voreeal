@@ -27,7 +27,7 @@ void ABasicVolumeActor::CheckForErrors()
 			->AddToken(FTextToken::Create(FText::FromString(TEXT("Basic volume actor has NULL BasicVolumeComponent property - please delete"))))
 			->AddToken(FMapErrorToken::Create(TEXT("BasicVolumeComponentNull")));
 	}
-	else if (BasicVolumeComponent->Volume == NULL)
+	else if (BasicVolumeComponent->GetVolume() == nullptr)
 	{
 		MapCheck.Warning()
 			->AddToken(FUObjectToken::Create(this))
@@ -39,9 +39,9 @@ void ABasicVolumeActor::CheckForErrors()
 bool ABasicVolumeActor::GetReferencedContentObjects(TArray<UObject*>& Objects) const
 {
 	Super::GetReferencedContentObjects(Objects);
-	if (BasicVolumeComponent && BasicVolumeComponent->Volume)
+	if (BasicVolumeComponent && BasicVolumeComponent->GetVolume())
 	{
-		Objects.Add(BasicVolumeComponent->Volume);
+		Objects.Add(BasicVolumeComponent->GetVolume());
 	}
 	return true;
 }

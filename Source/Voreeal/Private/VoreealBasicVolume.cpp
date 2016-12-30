@@ -112,7 +112,7 @@ void UBasicVolume::GetVoxel(const FVector& Location, FColor& Material, uint8& De
 
 FVoreealMesh UBasicVolume::ExtractMesh(const FVoreealExtractorOptions& Options)
 {
-	return ExtractMeshHelper(Volume.Get(), ExtractorType, Options);
+	return ExtractMeshHelper(Volume.Get(), Options.bOverrideExtractor ? Options.ExtractorType : ExtractorType, Options);
 }
 
 bool UBasicVolume::Internal_SetVoxel(FVector Location, const FColor& Material, const uint8& Density)

@@ -12,20 +12,20 @@ UBasicVolumeComponent::UBasicVolumeComponent(const class FObjectInitializer& Obj
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 
-	Volume = ObjectInitializer.CreateDefaultSubobject<UBasicVolume>(this, TEXT("NewVolume"));
+	SetBasicVolume(ObjectInitializer.CreateDefaultSubobject<UBasicVolume>(this, TEXT("NewVolume")));
 
 	EnsureRendering();
 }
 
 void UBasicVolumeComponent::PostLoad()
 {
-	Super::PostLoad();
-
-	if (Volume)
+	if (GetVolume())
 	{
-		Volume->ConditionalPostLoad();
+		GetVolume()->ConditionalPostLoad();
 		EnsureRendering();
 	}
+
+	Super::PostLoad();
 }
 
 void UBasicVolumeComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -37,7 +37,7 @@ void UBasicVolumeComponent::PostEditChangeProperty(FPropertyChangedEvent& Proper
 
 FString UBasicVolumeComponent::GetDetailedInfoInternal() const
 {
-	return (Volume != NULL) ? Volume->GetPathName(NULL) : TEXT("No_Volume");
+	return (GetVolume() != NULL) ? GetVolume()->GetPathName(NULL) : TEXT("No_Volume");
 }
 
 void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
@@ -62,9 +62,15 @@ void UBasicVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 
 				FVoreealExtractorOptions Options(TWeakPtr<FSparseOctree>(m_octree), node->m_selfId, node->m_bounds, 0);
 
+				if (bOverrideExtractor)
+				{
+					Options.bOverrideExtractor = true;
+					Options.ExtractorType = ExtractorType;
+				}
+
 				SCOPE_CYCLE_COUNTER(STAT_RequestMesh);
 
-				AddTask(Volume, Options);
+				AddTask(GetVolume(), Options);
 			}
 
 			return ETraverseOptions::Continue;
@@ -95,12 +101,12 @@ void UBasicVolumeComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// TODO: Bind somewhere else??
-	Volume->OnChanged.AddDynamic(this, &UBasicVolumeComponent::OnVolumeChanged);
+	GetVolume()->OnChanged.AddDynamic(this, &UBasicVolumeComponent::OnVolumeChanged);
 }
 
 bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 {
-	if (NewVolume == Volume && NewVolume == nullptr)
+	if (NewVolume == GetVolume() && NewVolume == nullptr)
 		return false;
 
 	AActor* Owner = GetOwner();
@@ -117,7 +123,9 @@ bool UBasicVolumeComponent::SetBasicVolume(UBasicVolume* NewVolume)
 		m_octree.Reset();
 	}
 
+	PRAGMA_DISABLE_DEPRECATION_WARNINGS
 	Volume = NewVolume;
+	PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 	// If there were a volume before we call then we force gc
 	UWorld* World = GetWorld();
@@ -155,13 +163,13 @@ void UBasicVolumeComponent::MarkVolumeDirty()
 	// Rebuild mesh
 	if (m_octree.IsValid())
 	{
-		m_octree->MarkChange(Volume->GetEnclosingRegion(), FTimespan(0, 0, FPlatformTime::Seconds()));
+		m_octree->MarkChangeNow(GetVolume()->GetEnclosingRegion());
 	}
 }
 
 bool UBasicVolumeComponent::PickFirstSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
 {
-	if (Volume == nullptr)
+	if (GetVolume() == nullptr)
 	{
 		return false;
 	}
@@ -172,12 +180,12 @@ bool UBasicVolumeComponent::PickFirstSolidVoxel(const FVector& Start, const FVec
 	WorldPositionToVolumePosition(Start, NewStart);
 	WorldPositionToVolumePosition(End, NewEnd);
 
-	return Volume->PickFirstSolidVoxel(NewStart, NewEnd, HitPoint);
+	return GetVolume()->PickFirstSolidVoxel(NewStart, NewEnd, HitPoint);
 }
 
 bool UBasicVolumeComponent::PickLastSolidVoxel(const FVector& Start, const FVector& End, FIntVector& HitPoint) const
 {
-	if (Volume == nullptr)
+	if (GetVolume() == nullptr)
 	{
 		return false;
 	}
@@ -188,7 +196,7 @@ bool UBasicVolumeComponent::PickLastSolidVoxel(const FVector& Start, const FVect
 	WorldPositionToVolumePosition(Start, NewStart);
 	WorldPositionToVolumePosition(End, NewEnd);
 
-	return Volume->PickLastSolidVoxel(NewStart, NewEnd, HitPoint);
+	return GetVolume()->PickLastSolidVoxel(NewStart, NewEnd, HitPoint);
 }
 
 void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
@@ -198,8 +206,8 @@ void UBasicVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 
 void UBasicVolumeComponent::EnsureRendering()
 {
-	if (Volume != nullptr && !m_octree.IsValid())
+	if (GetVolume() && !m_octree.IsValid())
 	{
-		m_octree = MakeShareable(new FSparseOctree(Volume, this, EOctreeConstructionModes::BoundCells));
+		m_octree = MakeShareable(new FSparseOctree(GetVolume(), this, EOctreeConstructionModes::BoundCells));
 	}
 }

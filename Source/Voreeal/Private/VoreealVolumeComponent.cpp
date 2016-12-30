@@ -9,6 +9,7 @@ UVoreealVolumeComponent::UVoreealVolumeComponent(const class FObjectInitializer&
 
 	MeshComponent = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("ProceduralMeshComponent"));
 	MeshComponent->AttachToComponent(this, FAttachmentTransformRules::KeepRelativeTransform);
+	MeshComponent->SetRelativeLocation(FVector::ZeroVector);
 
 	if (Material.Object != NULL)
 	{
@@ -60,14 +61,14 @@ void UVoreealVolumeComponent::AddTask(UVoreealVolume* Volume, const FVoreealExtr
 {
 	if (Volume == nullptr)
 	{
-		UE_LOG(LogVoreeal, Warning, TEXT("Task: Volume is null.  (This should never happen!)"));
+		UE_LOG(LogVoreeal, Error, TEXT("Task: Volume is null. (This should never happen!)"));
 		return;
 	}
 
 	if (Options.Region.Width <= 0 ||
 		Options.Region.Height <= 0)
 	{
-		UE_LOG(LogVoreeal, Warning, TEXT("Task: Region is to small. (This should never happen!)"));
+		UE_LOG(LogVoreeal, Error, TEXT("Task: Region is to small. (This should never happen!)"));
 		return;
 	}
 
@@ -75,13 +76,12 @@ void UVoreealVolumeComponent::AddTask(UVoreealVolume* Volume, const FVoreealExtr
 	{
 		Runnable->AddTask(Identifier, [Volume, Options]() -> FVoreealMesh
 		{
-			// TODO: Ensure that all tasks are done before deleting volume
 			return Volume->ExtractMesh(Options);
 		});
 	}
 	else
 	{
-		UE_LOG(LogVoreeal, Warning, TEXT("Task: Runnable? (This should never happen!)"));
+		UE_LOG(LogVoreeal, Error, TEXT("Task: Runnable? (This should never happen!)"));
 	}
 }
 

@@ -4,13 +4,13 @@
 #include "VoreealBasicVolumeComponent.h"
 #include "VoreealBasicVolumeActor.generated.h"
 
-UCLASS(ComponentWrapperClass)
+UCLASS(ComponentWrapperClass, meta = (ChildCanTick))
 class VOREEAL_API ABasicVolumeActor : public AVoreealActor
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Voreeal", meta = (ExposeFunctionCategories = "Voreeal,Rendering,Physics", AllowPrivateAccess = "true"))
+private_subobject:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Voreeal", meta = (ExposeFunctionCategories = "Voreeal,Mesh,Rendering,Physics,Components|StaticMesh", AllowPrivateAccess = "true"))
 	UBasicVolumeComponent* BasicVolumeComponent;
 
 public:
