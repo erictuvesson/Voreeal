@@ -111,33 +111,7 @@ void FVoreealWorker::AddTask(uint32 Identifier, TFunc Func)
 
 void FVoreealWorker::AddPriorityTask(uint32 Identifier, TFunc Func)
 {
-	// TODO: Add after all priority tasks
 	TasksMutex.lock();
 	Tasks.Insert(TTask(TPairInitializer<uint32, TFunc>(Identifier, Func)), 0);
 	TasksMutex.unlock();
 }
-
-
-//template <typename FVoreealMesh>
-//FVoreealNodeWorker* FVoreealWorker::Initialize()
-//{
-//	static FVoreealNodeWorker* Runnable = nullptr;
-//
-//	if (!Runnable && FPlatformProcess::SupportsMultithreading())
-//	{
-//		Runnable = new FVoreealNodeWorker();
-//	}
-//
-//	return Runnable;
-//}
-//
-//template <typename FVoreealMesh>
-//void FVoreealWorker::Shutdown()
-//{
-//	if (Runnable)
-//	{
-//		Runnable->EnsureCompletion();
-//		delete Runnable;
-//		Runnable = nullptr;
-//	}
-//}

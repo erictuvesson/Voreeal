@@ -18,7 +18,7 @@ class VOREEAL_API UVoreealVolumeComponent : public USceneComponent
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleAnywhere, Category = "Voreeal")
+	UPROPERTY(VisibleAnywhere, meta = (ExposeFunctionCategories = "Materials"))
 	class UProceduralMeshComponent* MeshComponent;
 
 public:
@@ -40,6 +40,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Voreeal)
 	void VolumeDirectionToWorldDirection(const FVector& LocalDirection, FVector& Result) const;
 
+public:
+	// Gets how many tasks currently are running.
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Voreeal|Task")
+	static int32 GetRunningTaskCount();
+
 protected:
 	// Get if there are any finished tasks.
 	bool FindFinishedTask(TSharedPtr<FVoreealMesh>& Result);
@@ -52,7 +57,4 @@ private:
 
 	static FVoreealWorker* Runnable;
 	static void InitWorker();
-
-	// TODO: Fix
-	friend class UVoreealBlueprintLibrary;
 };

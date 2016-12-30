@@ -72,13 +72,11 @@ public:
 
 		RegisterAssetTypeAction(AssetTools, MakeShareable(new FBasicVolumeAssetTypeActions(VoreealAssetCategoryBit)));
 
+		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		// Register the details customizations
 		{
-			FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-			PropertyModule.RegisterCustomClassLayout(UBasicVolume::StaticClass()->GetFName(), 
-				FOnGetDetailCustomizationInstance::CreateStatic(&FBasicVolumeDetailsCustomization::MakeInstance));
-			PropertyModule.RegisterCustomClassLayout(UBasicVolumeComponent::StaticClass()->GetFName(), 
-				FOnGetDetailCustomizationInstance::CreateStatic(&FBasicVolumeComponentDetailsCustomization::MakeInstance));
+			PropertyModule.RegisterCustomClassLayout(UBasicVolume::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&FBasicVolumeDetailsCustomization::MakeInstance));
+			PropertyModule.RegisterCustomClassLayout(UBasicVolumeComponent::StaticClass()->GetFName(), FOnGetDetailCustomizationInstance::CreateStatic(&FBasicVolumeComponentDetailsCustomization::MakeInstance));
 
 			PropertyModule.NotifyCustomizationModuleChanged();
 		}

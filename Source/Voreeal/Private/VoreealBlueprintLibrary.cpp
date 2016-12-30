@@ -5,15 +5,6 @@
 
 #include "DrawDebugHelpers.h"
 
-int32 UVoreealBlueprintLibrary::GetRunningTaskCount()
-{
-	if (UBasicVolumeComponent::Runnable != nullptr)
-	{
-		return UBasicVolumeComponent::Runnable->GetRunningTaskCount();
-	}
-	return -1;
-}
-
 void UVoreealBlueprintLibrary::DrawDebugRegion(UObject* WorldContextObject, const FTransform& Transform,
 	const FVoreealRegion& Region, const FLinearColor& LinearColor, float Duration, float Thickness)
 {

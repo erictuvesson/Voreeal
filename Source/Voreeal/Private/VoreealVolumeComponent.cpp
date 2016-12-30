@@ -40,6 +40,15 @@ void UVoreealVolumeComponent::VolumeDirectionToWorldDirection(const FVector& loc
 	result = GetComponentTransform().TransformVectorNoScale(localDirection);
 }
 
+int32 UVoreealVolumeComponent::GetRunningTaskCount()
+{
+	if (Runnable != nullptr)
+	{
+		return Runnable->GetRunningTaskCount();
+	}
+	return -1;
+}
+
 bool UVoreealVolumeComponent::FindFinishedTask(TSharedPtr<FVoreealMesh>& Result)
 {
 	Result = nullptr;

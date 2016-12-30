@@ -12,6 +12,9 @@ public:
 	virtual void CustomizeDetails(IDetailLayoutBuilder& DetailLayout) override;
 	// End IDetailCustomization Interface
 
+	bool ConvertToStaticMeshEnabled() const;
+	FReply ClickedOnConvertToStaticMesh();
+
 protected:
 	TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
 };
