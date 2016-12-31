@@ -1,6 +1,7 @@
 #include "VoreealPrivatePCH.h"
 #include "VoreealPagedVolumeComponent.h"
 #include "VoreealBlueprintLibrary.h"
+#include <PolyVox/Impl/Morton.h>
 
 #include "MessageLog.h"
 
@@ -85,10 +86,7 @@ void UPagedVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 			FVoreealMesh* Mesh = Task.Get();
 			FVoreealExtractorOptions Options = Mesh->GetOptions();
 
-			const uint32 XLowerBits = static_cast<uint32>(Options.PagedIdentifier.X & 0x1F);
-			const uint32 YLowerBits = static_cast<uint32>(Options.PagedIdentifier.Y & 0x1F);
-			const uint32 ZLowerBits = static_cast<uint32>(Options.PagedIdentifier.Z & 0x1F);
-			const uint32 LocationHash = (((XLowerBits)) | ((YLowerBits) << 5) | ((ZLowerBits) << 10) << 1);
+			const uint32 LocationHash = MortonHash(Options.PagedIdentifier.X, Options.PagedIdentifier.Y, Options.PagedIdentifier.Z);
 
 			// Get the procedural mesh component 
 			UProceduralMeshComponent* MComponent = nullptr;
@@ -151,12 +149,7 @@ bool UPagedVolumeComponent::SetPagedVolume(UVoreealPagedVolume* NewVolume)
 
 FPagedVolumeChunk* UPagedVolumeComponent::GetChunk(int32 X, int32 Y, int32 Z) const
 {
-	// TODO: Will have to update this hash method later to support more chunks at once.
-	//		 This is also used in a few places here!
-	const uint32 XLowerBits = static_cast<uint32>(X & 0x1F);
-	const uint32 YLowerBits = static_cast<uint32>(Y & 0x1F);
-	const uint32 ZLowerBits = static_cast<uint32>(Z & 0x1F);
-	const uint32 LocationHash = (((XLowerBits)) | ((YLowerBits) << 5) | ((ZLowerBits) << 10) << 1);
+	const uint32 LocationHash = MortonHash(X, Y, Z);
 
 	// check if it's the last one we accessed. 
 	if (getChunkCache) //< TODO: Validate?
@@ -186,10 +179,7 @@ FPagedVolumeChunk* UPagedVolumeComponent::CreateChunk(int32 X, int32 Y, int32 Z)
 {
 	// We assume it doesn't exists
 
-	const uint32 XLowerBits = static_cast<uint32>(X & 0x1F);
-	const uint32 YLowerBits = static_cast<uint32>(Y & 0x1F);
-	const uint32 ZLowerBits = static_cast<uint32>(Z & 0x1F);
-	const uint32 LocationHash = (((XLowerBits)) | ((YLowerBits) << 5) | ((ZLowerBits) << 10) << 1);
+	const uint32 LocationHash = MortonHash(X, Y, Z);
 
 	FVoreealRegion Region = FVoreealRegion(X * 128, Y * 128, Z * 128, 128, 128, 128);
 
@@ -217,20 +207,34 @@ void UPagedVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 		}
 	}
 
+	//maximum chunks intersecting this region, 
+	//	assuming non-coincident edges, and uniform chunk size (as created above):
+	uint32 i = 0;
+	uint32 const iCrit = (Region.Width/128 +2) * (Region.Height/128 +2) * (Region.Depth/128 +2);
+
 	// loop all chunks
 	for (TSharedPtr<FPagedVolumeChunk> Chunk : ArrayChunks)
 	{
 		if (Chunk->m_octree.IsValid())
 		{
 			EContainmentType ContainResult = FVoreealRegion::Contains(onVolumeCache->m_bounds, Region);
-			if (ContainResult == EContainmentType::Contains ||
-				ContainResult == EContainmentType::Intersects)
+			if (ContainResult == EContainmentType::Contains)
 			{
 				onVolumeCache = Chunk.Get();
 				onVolumeCache->m_octree->MarkChangeNow(Region);
-
-				// TODO: When are we done? Can we end it early?
+				return;
+			}				
+			if (ContainResult == EContainmentType::Intersects)
+			{
+				onVolumeCache = Chunk.Get();
+				onVolumeCache->m_octree->MarkChangeNow(Region);
+				if(++i >= iCrit) return;
 			}
 		}
 	}
+}
+
+uint32 UPagedVolumeComponent::MortonHash(int32 X, int32 Y, int32 Z)
+{
+	return (::PolyVox::morton256_x[X & 0xff] | ::PolyVox::morton256_y[Y & 0xff] | ::PolyVox::morton256_z[Z & 0xff]);
 }
