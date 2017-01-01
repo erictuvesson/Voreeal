@@ -69,6 +69,8 @@ private:
 	UFUNCTION()
 	void OnVolumeChanged(FVoreealRegion Region);
 
+	uint32 MortonHash(int32 X, int32 Y, int32 Z);
+	
 private:
 	TArray<TSharedPtr<FPagedVolumeChunk>> ArrayChunks;
 	mutable FPagedVolumeChunk *getChunkCache, *onVolumeCache;
