@@ -33,7 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voreeal")
 	UPagedVolumePager* Pager;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "Voreeal")
 	TMap<uint32, UProceduralMeshComponent*> ProceduralMeshComponents;
 
 public:
@@ -51,6 +51,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Components|Voreeal")
 	virtual bool SetPagedVolume(UVoreealPagedVolume* NewVolume);
+
+	UFUNCTION(BlueprintCallable, Category = "Voreeal|TEST")
+	void TestChunk(int32 X, int32 Y, int32 Z)
+	{
+		CreateChunk(X, Y, Z);
+	}
 
 protected:
 	// Gets the chunk at x,y,z.

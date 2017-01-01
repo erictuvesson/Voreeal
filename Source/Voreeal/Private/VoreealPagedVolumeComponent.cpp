@@ -20,6 +20,7 @@ UPagedVolumeComponent::UPagedVolumeComponent(const class FObjectInitializer& Obj
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 
 	Volume = ObjectInitializer.CreateDefaultSubobject<UVoreealPagedVolume>(this, TEXT("NewPagedVolume"));
+	Pager = ObjectInitializer.CreateDefaultSubobject<UPagedVolumePager>(this, TEXT("NewPagerVolume"));
 }
 
 void UPagedVolumeComponent::PostLoad()
@@ -67,6 +68,8 @@ void UPagedVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 
 					FVoreealExtractorOptions Options(Chunk->m_octree, Node->m_selfId, Node->m_bounds, 0);
 
+					SCOPE_CYCLE_COUNTER(STAT_RequestMesh);
+
 					AddTask(Volume, Options);
 				}
 
@@ -98,7 +101,7 @@ void UPagedVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 			if (MComponent == nullptr)
 			{
 				MComponent = NewObject<UProceduralMeshComponent>();
-				ProceduralMeshComponents[LocationHash] = MComponent;
+				ProceduralMeshComponents.Add(LocationHash, MComponent);
 			}
 
 			// Update the mesh node
@@ -196,6 +199,11 @@ FPagedVolumeChunk* UPagedVolumeComponent::CreateChunk(int32 X, int32 Y, int32 Z)
 	TSharedPtr<FPagedVolumeChunk> Result = 
 		MakeShareable(new FPagedVolumeChunk(
 			MakeShareable(new FSparseOctree(Volume, this, Region, EOctreeConstructionModes::BoundCells)), LocationHash, Region));
+
+	if (Pager)
+	{
+		Pager->OnLoadChunk(Volume, Region);
+	}
 
 	ArrayChunks.Add(Result);
 
