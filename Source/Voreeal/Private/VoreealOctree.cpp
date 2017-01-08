@@ -221,12 +221,21 @@ void FSparseOctree::BuildNode(int32 parentId)
 			ChildRegion.X = (i % 2 == 0 ? Min.X : Center.X);
 			ChildRegion.Y = ((i < 2 || i == 4 || i == 5) ? Min.Y : Center.Y);
 			ChildRegion.Z = (i < 4 ? Min.Z : Center.Z);
-			ChildRegion.Width  = (i % 2 == 0 ? Center.X : Max.X);
-			ChildRegion.Height = ((i < 2 || i == 4 || i == 5) ? Center.Y : Max.Y);
-			ChildRegion.Depth  = (i < 4 ? Center.Z : Max.Z);
+
+			int MaxX = (i % 2 == 0 ? Center.X : Max.X);
+			int MaxY = ((i < 2 || i == 4 || i == 5) ? Center.Y : Max.Y);
+			int MaxZ = (i < 4 ? Center.Z : Max.Z);;
+
+			ChildRegion.Width  = MaxX - ChildRegion.X;
+			ChildRegion.Height = MaxY - ChildRegion.Y;
+			ChildRegion.Depth  = MaxZ - ChildRegion.Z;
 
 			if (FVoreealRegion::Intersect(ChildRegion, m_bounds))
 			{
+				verifyf(ChildRegion.Width < 255, TEXT("Region width has to be lower than 255."));
+				verifyf(ChildRegion.Height < 255, TEXT("Region height has to be lower than 255."));
+				verifyf(ChildRegion.Depth < 255, TEXT("Region depth has to be lower than 255."));
+
 				int32 Node = CreateNode(ChildRegion, parentId);
 				ParentNode->m_childrenId[i] = Node;
 				ParentNode->m_hasChildren = true;

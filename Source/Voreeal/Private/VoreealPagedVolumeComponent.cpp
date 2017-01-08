@@ -99,6 +99,7 @@ void UPagedVolumeComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 			if (MComponent == nullptr)
 			{
 				MComponent = NewObject<UProceduralMeshComponent>();
+				MComponent->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 				ProceduralMeshComponents.Add(LocationHash, MComponent);
 			}
 
@@ -189,6 +190,8 @@ FPagedVolumeChunk* UPagedVolumeComponent::CreateChunk(int32 X, int32 Y, int32 Z)
 	TSharedPtr<FPagedVolumeChunk> Result = 
 		MakeShareable(new FPagedVolumeChunk(
 			MakeShareable(new FSparseOctree(Volume, this, Region, EOctreeConstructionModes::BoundCells)), LocationHash, Region));
+
+	Volume->AddChunk(X, Y, Z);
 
 	if (Pager)
 	{

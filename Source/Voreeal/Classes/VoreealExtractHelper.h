@@ -101,6 +101,10 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 	PolyVox::Region PRegion = (PolyVox::Region)Options.Region;
 	FVector RegionLower = Options.Region.GetLower().GetAbs();
 
+	verifyf(PRegion.getWidthInCells() < 255, TEXT("Region width has to be lower than 255."));
+	verifyf(PRegion.getHeightInCells() < 255, TEXT("Region height has to be lower than 255."));
+	verifyf(PRegion.getDepthInCells() < 255, TEXT("Region depth has to be lower than 255."));
+
 	FVoreealMesh Result = FVoreealMesh(Options);
 
 	// Process LOD
@@ -122,11 +126,9 @@ inline FVoreealMesh VoreealExtractHelper<TVolume, TVoxelType>::ExtractMeshHelper
 			auto vertex = decodeVertex(mesh.getVertex(i));
 
 			FVector VertexPosition = FVector(vertex.position.getX(), vertex.position.getY(), vertex.position.getZ());
-			FVector VertexNormal = FVector(vertex.normal.getX(), vertex.normal.getY(), vertex.normal.getZ());
-			// Normals are not supported by CubicSurface Extractor, so this should probably be removed.
+			// CubicSurface Extractor doesn't support normals.
 
 			Result.Vertices.Add(RegionLower + VertexPosition);
-			//Result.Normals.Add(VertexNormal);
 
 			FColor Color;
 			Color.R = (vertex.data.getMaterial() & 0x000000FF);

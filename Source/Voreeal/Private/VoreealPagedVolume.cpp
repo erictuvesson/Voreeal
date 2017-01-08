@@ -14,10 +14,15 @@ void UPagedVolumePager::OnLoadChunk_Implementation(UVoreealPagedVolume* Volume, 
 			for (int32 y = 0; y < Region.Height; y++)
 			{
 				int32 actualY = Region.GetLower().Y + y;
-				if (actualY < 32)
-				{
-					Volume->SetVoxelXYZ(actualX, actualY, actualZ, FColor::White, 255);
-				}
+				Volume->SetVoxelXYZ(actualX, actualY, actualZ, FColor::White, 255);
+				//if (actualY < 32)
+				//{
+				//	Volume->SetVoxelXYZ(actualX, actualY, actualZ, FColor::White, 255);
+				//}
+				//else
+				//{
+				//	break;
+				//}
 			}
 		}
 	}
@@ -64,6 +69,16 @@ bool UVoreealPagedVolume::AddChunk(int32 X, int32 Y, int32 Z)
 	if (IsValid())
 	{
 		// TODO: 
+		const int ChunkSize = 128;
+		int OffsetX = ChunkSize * X;
+		int OffsetY = ChunkSize * Y;
+		int OffsetZ = ChunkSize * Z;
+
+		PolyVox::Region region(
+			OffsetX, OffsetY, OffsetZ,
+			OffsetX + ChunkSize, OffsetY + ChunkSize, OffsetZ + ChunkSize);
+
+		Volume->prefetch(region);
 		return true;
 	}
 	return false;
