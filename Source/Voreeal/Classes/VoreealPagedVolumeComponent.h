@@ -69,7 +69,7 @@ private:
 	UFUNCTION()
 	void OnVolumeChanged(FVoreealRegion Region);
 
-	uint32 MortonHash(int32 X, int32 Y, int32 Z);
+	uint32 MortonHash(int32 X, int32 Y, int32 Z) const;
 	
 private:
 	TArray<TSharedPtr<FPagedVolumeChunk>> ArrayChunks;

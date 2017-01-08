@@ -242,7 +242,7 @@ void UPagedVolumeComponent::OnVolumeChanged(FVoreealRegion Region)
 	}
 }
 
-uint32 UPagedVolumeComponent::MortonHash(int32 X, int32 Y, int32 Z)
+uint32 UPagedVolumeComponent::MortonHash(int32 X, int32 Y, int32 Z) const
 {
 	return (::PolyVox::morton256_x[X & 0xff] | ::PolyVox::morton256_y[Y & 0xff] | ::PolyVox::morton256_z[Z & 0xff]);
 }
