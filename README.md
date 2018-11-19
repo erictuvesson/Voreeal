@@ -1,6 +1,8 @@
 # Voreeal _[Unreal Engine 4.14]_
 Voreeal is a voxel library for Unreal Engine 4 powered by [PolyVox](https://bitbucket.org/volumesoffun/polyvox).
 
+> __This project has been discontinued. If you are looking for a voxel framework I recommend [VoxelFarm](https://www.voxelfarm.com/index.html).__
+
 > __This project is still a work in progress, a lot of things are not implemented yet.__
 
 ## Supported voxel formats:
